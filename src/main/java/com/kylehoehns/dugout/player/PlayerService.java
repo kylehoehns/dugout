@@ -36,4 +36,13 @@ public class PlayerService {
                 new ResponseStatusException(HttpStatus.NOT_FOUND)
             );
     }
+
+    public Player createPlayer(CreatePlayerRequest request) {
+        long nextId = playerRepository.findAll().stream()
+            .mapToLong(Player::getId)
+            .max()
+            .orElse(0L) + 1;
+        Player player = new Player(nextId, request.name(), request.position());
+        return playerRepository.save(player);
+    }
 }
