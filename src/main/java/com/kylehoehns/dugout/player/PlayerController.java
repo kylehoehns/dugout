@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,8 +22,8 @@ public class PlayerController {
     }
 
     @GetMapping
-    public List<Player> getPlayers() {
-        return playerService.getPlayers();
+    public List<Player> getPlayers(@RequestParam(required = false) String position) {
+        return playerService.getPlayers(position);
     }
 
     @GetMapping("/{id}")

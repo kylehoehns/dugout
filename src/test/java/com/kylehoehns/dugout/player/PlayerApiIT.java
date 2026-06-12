@@ -86,6 +86,120 @@ class PlayerApiIT {
 		assertThat(status).isEqualTo(404);
 	}
 
+	private void seedRoster() {
+		playerRepository.saveAll(List.of(
+			new Player(1L, "Hank Aaron", "RF"),
+			new Player(2L, "Willie Mays", "CF"),
+			new Player(3L, "Ozzie Smith", "SS")
+		));
+	}
+
+	@Test
+	@DisplayName("returns all players when no position filter is provided")
+	void should_return_all_players_when_no_position_filter_is_provided() throws Exception {
+		// given
+		seedRoster();
+
+		// when
+		var response = mockMvc.perform(get("/api/players"))
+			.andReturn().getResponse();
+		var players = objectMapper.readValue(response.getContentAsString(), Player[].class);
+
+		// then
+		assertThat(response.getStatus()).isEqualTo(200);
+		assertThat(players).hasSize(3);
+		assertThat(players).extracting(Player::getName)
+			.containsExactlyInAnyOrder("Hank Aaron", "Willie Mays", "Ozzie Smith");
+	}
+
+	@Test
+	@DisplayName("returns only the matching player when filtering by position (uppercase)")
+	void should_return_matching_player_when_filtering_by_position_uppercase() throws Exception {
+		// given
+		seedRoster();
+
+		// when
+		var response = mockMvc.perform(get("/api/players").param("position", "SS"))
+			.andReturn().getResponse();
+		var players = objectMapper.readValue(response.getContentAsString(), Player[].class);
+
+		// then
+		assertThat(response.getStatus()).isEqualTo(200);
+		assertThat(players).hasSize(1);
+		assertThat(players[0].getName()).isEqualTo("Ozzie Smith");
+		assertThat(players[0].getPosition()).isEqualTo("SS");
+	}
+
+	@Test
+	@DisplayName("returns only the matching player when filtering by position (lowercase, case-insensitive)")
+	void should_return_matching_player_when_filtering_by_position_lowercase() throws Exception {
+		// given
+		seedRoster();
+
+		// when
+		var response = mockMvc.perform(get("/api/players").param("position", "ss"))
+			.andReturn().getResponse();
+		var players = objectMapper.readValue(response.getContentAsString(), Player[].class);
+
+		// then
+		assertThat(response.getStatus()).isEqualTo(200);
+		assertThat(players).hasSize(1);
+		assertThat(players[0].getName()).isEqualTo("Ozzie Smith");
+		assertThat(players[0].getPosition()).isEqualTo("SS");
+	}
+
+	@Test
+	@DisplayName("returns empty list when no players match the given position")
+	void should_return_empty_list_when_no_players_match_position() throws Exception {
+		// given
+		seedRoster();
+
+		// when
+		var response = mockMvc.perform(get("/api/players").param("position", "ZZ"))
+			.andReturn().getResponse();
+		var players = objectMapper.readValue(response.getContentAsString(), Player[].class);
+
+		// then
+		assertThat(response.getStatus()).isEqualTo(200);
+		assertThat(players).isEmpty();
+	}
+
+	@Test
+	@DisplayName("returns all players when position param is an empty string")
+	void should_return_all_players_when_position_param_is_empty_string() throws Exception {
+		// given
+		seedRoster();
+
+		// when
+		var response = mockMvc.perform(get("/api/players").param("position", ""))
+			.andReturn().getResponse();
+		var players = objectMapper.readValue(response.getContentAsString(), Player[].class);
+
+		// then
+		assertThat(response.getStatus()).isEqualTo(200);
+		assertThat(players).hasSize(3);
+		assertThat(players).extracting(Player::getName)
+			.containsExactlyInAnyOrder("Hank Aaron", "Willie Mays", "Ozzie Smith");
+	}
+
+	@Test
+	@DisplayName("returns all players when position param is whitespace only")
+	void should_return_all_players_when_position_param_is_whitespace_only() throws Exception {
+		// given
+		seedRoster();
+
+		// when
+		var response = mockMvc.perform(get("/api/players").param("position", "  "))
+			.andReturn().getResponse();
+		var players = objectMapper.readValue(response.getContentAsString(), Player[].class);
+
+		// then
+		assertThat(response.getStatus()).isEqualTo(200);
+		assertThat(players).hasSize(3);
+		assertThat(players).extracting(Player::getName)
+			.containsExactlyInAnyOrder("Hank Aaron", "Willie Mays", "Ozzie Smith");
+	}
+
 	@Test
 	@DisplayName("creates a player and returns it with 201 status")
 	void should_create_player_and_return_201_when_posting_valid_request() throws Exception {

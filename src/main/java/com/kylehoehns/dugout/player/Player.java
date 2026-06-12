@@ -2,8 +2,11 @@ package com.kylehoehns.dugout.player;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(indexes = @Index(name = "idx_player_position", columnList = "position"))
 public class Player {
 	@Id
 	private Long id;

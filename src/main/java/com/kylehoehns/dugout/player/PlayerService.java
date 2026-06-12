@@ -26,8 +26,11 @@ public class PlayerService {
         }
     }
 
-    public List<Player> getPlayers() {
-        return playerRepository.findAll();
+    public List<Player> getPlayers(String position) {
+        if (position == null || position.isBlank()) {
+            return playerRepository.findAll();
+        }
+        return playerRepository.findByPositionIgnoreCase(position.strip());
     }
 
     public Player getPlayerById(Long id) {
