@@ -2,6 +2,8 @@
 
 Companion repo for the talk **"From Sidebar to Sub-Agents: A Live, Hands-On Intro to Building with AI Agents."**
 
+**Slides:** [www.kylehoehns.com/talks/sidebar-to-subagents](https://www.kylehoehns.com/talks/sidebar-to-subagents)
+
 It starts as a blank Spring Boot project with **zero** AI involvement and climbs
 the AI-assisted-development ladder one stage at a time — from asking questions in
 a sidebar, to letting an agent edit and test code, to a custom skill, to quality
