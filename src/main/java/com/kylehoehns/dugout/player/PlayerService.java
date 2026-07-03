@@ -18,11 +18,11 @@ public class PlayerService {
     @PostConstruct
     public void seedPlayers() {
         if (playerRepository.count() == 0) {
-            playerRepository.saveAll(List.of(
-                new Player(1L, "Hank Aaron", "RF"),
-                new Player(2L, "Willie Mays", "CF"),
-                new Player(3L, "Ozzie Smith", "SS")
-            ));
+            playerRepository.saveAll(
+                    List.of(
+                            new Player(1L, "Hank Aaron", "RF"),
+                            new Player(2L, "Willie Mays", "CF"),
+                            new Player(3L, "Ozzie Smith", "SS")));
         }
     }
 
@@ -34,17 +34,14 @@ public class PlayerService {
     }
 
     public Player getPlayerById(Long id) {
-        return playerRepository.findById(id)
-            .orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND)
-            );
+        return playerRepository
+                .findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
     public Player createPlayer(CreatePlayerRequest request) {
-        long nextId = playerRepository.findAll().stream()
-            .mapToLong(Player::getId)
-            .max()
-            .orElse(0L) + 1;
+        long nextId =
+                playerRepository.findAll().stream().mapToLong(Player::getId).max().orElse(0L) + 1;
         Player player = new Player(nextId, request.name(), request.position());
         return playerRepository.save(player);
     }
