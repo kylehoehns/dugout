@@ -59,4 +59,36 @@ class PlayerStatsResponseTest {
         assertThat(response.battingAvg()).isEqualTo(0.000);
         assertThat(response.battingAvg()).isNotNaN();
     }
+
+    @Test
+    @DisplayName("builds the name without the last name when last name is null")
+    void should_build_name_when_last_name_is_null() {
+        // given
+        var stats = new PlayerStats();
+        stats.setJerseyNumber(4);
+        stats.setFirstName("Tate");
+        stats.setLastName(null);
+
+        // when
+        var response = PlayerStatsResponse.from(stats);
+
+        // then
+        assertThat(response.name()).isEqualTo("Tate");
+    }
+
+    @Test
+    @DisplayName("builds an empty name when both first and last name are null")
+    void should_build_empty_name_when_first_and_last_name_are_null() {
+        // given
+        var stats = new PlayerStats();
+        stats.setJerseyNumber(7);
+        stats.setFirstName(null);
+        stats.setLastName(null);
+
+        // when
+        var response = PlayerStatsResponse.from(stats);
+
+        // then
+        assertThat(response.name()).isEmpty();
+    }
 }

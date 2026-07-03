@@ -43,6 +43,19 @@ class RosterStatsLoaderTest {
     }
 
     @Test
+    @DisplayName("skips a row when it has too many columns")
+    void should_skip_row_when_column_count_has_extra_fields() throws Exception {
+        // given
+        String line = "4,Tate,Hoehns,16,28,12,1,0,0,10,17,9,8,20,99";
+
+        // when
+        PlayerStats stats = parseLine(line);
+
+        // then
+        assertThat(stats).isNull();
+    }
+
+    @Test
     @DisplayName("skips a row when a numeric field is non-numeric")
     void should_skip_row_when_field_is_non_numeric() throws Exception {
         // given

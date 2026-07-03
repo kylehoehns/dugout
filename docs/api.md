@@ -161,10 +161,13 @@ An array of stats objects.
 
 ```json
 [
-  { "jerseyNumber": 4,  "name": "Tate Hoehns",   "gamesPlayed": 30, "atBats": 28,  "hits": 12, "doubles": 3, "triples": 1, "homeRuns": 2, "rbi": 14, "runs": 15, "walks": 6, "strikeouts": 9,  "stolenBases": 5,  "battingAvg": 0.429 },
-  { "jerseyNumber": 92, "name": "Ricky Nash",    "gamesPlayed": 30, "atBats": 95,  "hits": 30, "doubles": 4, "triples": 2, "homeRuns": 1, "rbi": 18, "runs": 40, "walks": 12, "strikeouts": 20, "stolenBases": 41, "battingAvg": 0.316 }
+  { "jerseyNumber": 23, "name": "Mason Reed",  "gamesPlayed": 23, "atBats": 41, "hits": 25, "doubles": 10, "triples": 0, "homeRuns": 0, "rbi": 20, "runs": 25, "walks": 12, "strikeouts": 1, "stolenBases": 13, "battingAvg": 0.610 },
+  { "jerseyNumber": 92, "name": "Cooper Lane", "gamesPlayed": 23, "atBats": 45, "hits": 26, "doubles": 2,  "triples": 0, "homeRuns": 0, "rbi": 4,  "runs": 37, "walks": 18, "strikeouts": 9, "stolenBases": 41, "battingAvg": 0.578 }
 ]
 ```
+
+The values above are the top two entries from the seeded `roster-stats.csv`
+(sorted by `battingAvg` descending).
 
 **Example**
 
@@ -174,10 +177,14 @@ GET /api/stats
 
 ```json
 [
-  { "jerseyNumber": 4,  "name": "Tate Hoehns", "gamesPlayed": 30, "atBats": 28, "hits": 12, "doubles": 3, "triples": 1, "homeRuns": 2, "rbi": 14, "runs": 15, "walks": 6, "strikeouts": 9, "stolenBases": 5, "battingAvg": 0.429 },
-  { "jerseyNumber": 7,  "name": "Sam Diaz",     "gamesPlayed": 30, "atBats": 40, "hits": 0,  "doubles": 0, "triples": 0, "homeRuns": 0, "rbi": 0,  "runs": 1,  "walks": 2, "strikeouts": 18, "stolenBases": 0, "battingAvg": 0.000 }
+  { "jerseyNumber": 23, "name": "Mason Reed",   "gamesPlayed": 23, "atBats": 41, "hits": 25, "doubles": 10, "triples": 0, "homeRuns": 0, "rbi": 20, "runs": 25, "walks": 12, "strikeouts": 1, "stolenBases": 13, "battingAvg": 0.610 },
+  { "jerseyNumber": 4,  "name": "Tate Hoehns",  "gamesPlayed": 16, "atBats": 28, "hits": 12, "doubles": 1,  "triples": 0, "homeRuns": 0, "rbi": 10, "runs": 17, "walks": 9, "strikeouts": 8, "stolenBases": 20, "battingAvg": 0.429 }
 ]
 ```
+
+> A player with **0 at-bats** returns `"battingAvg": 0.000` (never a
+> divide-by-zero, `NaN`, or `Infinity`). Every player in the seeded roster has
+> at least one at-bat, so no seeded row hits this case.
 
 ---
 
@@ -196,7 +203,7 @@ GET /api/stats/{number}
 **Response — 200 OK**
 
 ```json
-{ "jerseyNumber": 4, "name": "Tate Hoehns", "gamesPlayed": 30, "atBats": 28, "hits": 12, "doubles": 3, "triples": 1, "homeRuns": 2, "rbi": 14, "runs": 15, "walks": 6, "strikeouts": 9, "stolenBases": 5, "battingAvg": 0.429 }
+{ "jerseyNumber": 4, "name": "Tate Hoehns", "gamesPlayed": 16, "atBats": 28, "hits": 12, "doubles": 1, "triples": 0, "homeRuns": 0, "rbi": 10, "runs": 17, "walks": 9, "strikeouts": 8, "stolenBases": 20, "battingAvg": 0.429 }
 ```
 
 **Response fields**
@@ -225,7 +232,7 @@ GET /api/stats/4
 ```
 
 ```json
-{ "jerseyNumber": 4, "name": "Tate Hoehns", "gamesPlayed": 30, "atBats": 28, "hits": 12, "doubles": 3, "triples": 1, "homeRuns": 2, "rbi": 14, "runs": 15, "walks": 6, "strikeouts": 9, "stolenBases": 5, "battingAvg": 0.429 }
+{ "jerseyNumber": 4, "name": "Tate Hoehns", "gamesPlayed": 16, "atBats": 28, "hits": 12, "doubles": 1, "triples": 0, "homeRuns": 0, "rbi": 10, "runs": 17, "walks": 9, "strikeouts": 8, "stolenBases": 20, "battingAvg": 0.429 }
 ```
 
 ```
@@ -233,7 +240,7 @@ GET /api/stats/92
 ```
 
 ```json
-{ "jerseyNumber": 92, "name": "Ricky Nash", "gamesPlayed": 30, "atBats": 95, "hits": 30, "doubles": 4, "triples": 2, "homeRuns": 1, "rbi": 18, "runs": 40, "walks": 12, "strikeouts": 20, "stolenBases": 41, "battingAvg": 0.316 }
+{ "jerseyNumber": 92, "name": "Cooper Lane", "gamesPlayed": 23, "atBats": 45, "hits": 26, "doubles": 2, "triples": 0, "homeRuns": 0, "rbi": 4, "runs": 37, "walks": 18, "strikeouts": 9, "stolenBases": 41, "battingAvg": 0.578 }
 ```
 
 **Error cases**

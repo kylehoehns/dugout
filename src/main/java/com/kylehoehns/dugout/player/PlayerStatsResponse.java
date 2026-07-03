@@ -20,7 +20,9 @@ public record PlayerStatsResponse(
         double battingAvg) {
 
     public static PlayerStatsResponse from(PlayerStats stats) {
-        String name = stats.getFirstName() + " " + stats.getLastName();
+        String firstName = stats.getFirstName() == null ? "" : stats.getFirstName();
+        String lastName = stats.getLastName() == null ? "" : stats.getLastName();
+        String name = (firstName + " " + lastName).trim();
         return new PlayerStatsResponse(
                 stats.getJerseyNumber(),
                 name,
