@@ -184,20 +184,20 @@ GET /api/stats
 ```json
 [
   {
-    "jerseyNumber": 4,
-    "name": "Tate Hoehns",
-    "gamesPlayed": 30,
-    "atBats": 28,
-    "hits": 12,
-    "doubles": 3,
-    "triples": 1,
-    "homeRuns": 2,
-    "rbi": 14,
-    "runs": 16,
-    "walks": 5,
-    "strikeouts": 6,
-    "stolenBases": 4,
-    "battingAvg": 0.429
+    "jerseyNumber": 23,
+    "name": "Mason Reed",
+    "gamesPlayed": 23,
+    "atBats": 41,
+    "hits": 25,
+    "doubles": 10,
+    "triples": 0,
+    "homeRuns": 0,
+    "rbi": 20,
+    "runs": 25,
+    "walks": 12,
+    "strikeouts": 1,
+    "stolenBases": 13,
+    "battingAvg": 0.610
   }
 ]
 ```
@@ -231,17 +231,17 @@ GET /api/stats/4
 {
   "jerseyNumber": 4,
   "name": "Tate Hoehns",
-  "gamesPlayed": 30,
+  "gamesPlayed": 16,
   "atBats": 28,
   "hits": 12,
-  "doubles": 3,
-  "triples": 1,
-  "homeRuns": 2,
-  "rbi": 14,
-  "runs": 16,
-  "walks": 5,
-  "strikeouts": 6,
-  "stolenBases": 4,
+  "doubles": 1,
+  "triples": 0,
+  "homeRuns": 0,
+  "rbi": 10,
+  "runs": 17,
+  "walks": 9,
+  "strikeouts": 8,
+  "stolenBases": 20,
   "battingAvg": 0.429
 }
 ```

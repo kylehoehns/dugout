@@ -130,4 +130,23 @@ class PlayerStatsApiIT {
 		assertThat(result.atBats()).isEqualTo(0);
 		assertThat(result.battingAvg()).isEqualTo(0.000);
 	}
+
+	@Test
+	@DisplayName("returns a battingAvg of 0.000 when the player has a null hits value")
+	void should_return_zero_batting_avg_when_hits_is_null() throws Exception {
+		// given
+		playerStatsRepository.save(
+			new PlayerStats(51, "No", "Hits", 5, 10, null, 0, 0, 0, 0, 0, 0, 0, 0)
+		);
+
+		// when
+		var response = mockMvc.perform(get("/api/stats/{number}", 51))
+			.andReturn().getResponse();
+		var result = objectMapper.readValue(response.getContentAsString(), PlayerStatsResponse.class);
+
+		// then
+		assertThat(response.getStatus()).isEqualTo(200);
+		assertThat(result.hits()).isNull();
+		assertThat(result.battingAvg()).isEqualTo(0.000);
+	}
 }

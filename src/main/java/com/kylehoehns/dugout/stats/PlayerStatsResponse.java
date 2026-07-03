@@ -40,7 +40,7 @@ public record PlayerStatsResponse(
     }
 
     private static double calculateBattingAvg(Integer hits, Integer atBats) {
-        if (atBats == null || atBats == 0) {
+        if (atBats == null || atBats == 0 || hits == null) {
             return 0.000;
         }
         return BigDecimal.valueOf(hits)

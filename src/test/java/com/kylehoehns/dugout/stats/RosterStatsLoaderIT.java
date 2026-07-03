@@ -32,6 +32,9 @@ class RosterStatsLoaderIT {
 	@Autowired
 	PlayerStatsRepository playerStatsRepository;
 
+	@Autowired
+	RosterStatsLoader rosterStatsLoader;
+
 	@Test
 	@DisplayName("seeds the roster from the CSV file on startup when the table is empty")
 	void should_seed_roster_from_csv_when_table_is_empty() throws Exception {
@@ -61,13 +64,13 @@ class RosterStatsLoaderIT {
 
 	@Test
 	@DisplayName("does not seed the roster again when the table is already populated")
-	void should_not_reseed_roster_when_table_already_populated() {
+	void should_not_reseed_roster_when_table_already_populated() throws Exception {
 		// given: startup already seeded 12 rows into this fresh context (see prior test)
 
-		// when
-		long countAfterStartup = playerStatsRepository.count();
+		// when: the loader runs again against the already-populated table
+		rosterStatsLoader.run();
 
 		// then: still exactly the CSV row count, no duplicates from a second run
-		assertThat(countAfterStartup).isEqualTo(12);
+		assertThat(playerStatsRepository.count()).isEqualTo(12);
 	}
 }
