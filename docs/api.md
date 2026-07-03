@@ -138,3 +138,107 @@ Content-Type: application/json
 
 { "id": 4, "name": "Roberto Clemente", "position": "RF" }
 ```
+
+---
+
+## Roster Batting Stats
+
+Batting stats for the roster, seeded from `roster-stats.csv` on application
+startup. This is additive — it does not change the `Player` entity or the
+`/api/players` endpoints.
+
+### List stats
+
+Returns every player's batting stats, sorted by `battingAvg` descending.
+
+```
+GET /api/stats
+```
+
+**Response — 200 OK**
+
+An array of stats objects.
+
+```json
+[
+  { "jerseyNumber": 4,  "name": "Tate Hoehns",   "gamesPlayed": 30, "atBats": 28,  "hits": 12, "doubles": 3, "triples": 1, "homeRuns": 2, "rbi": 14, "runs": 15, "walks": 6, "strikeouts": 9,  "stolenBases": 5,  "battingAvg": 0.429 },
+  { "jerseyNumber": 92, "name": "Ricky Nash",    "gamesPlayed": 30, "atBats": 95,  "hits": 30, "doubles": 4, "triples": 2, "homeRuns": 1, "rbi": 18, "runs": 40, "walks": 12, "strikeouts": 20, "stolenBases": 41, "battingAvg": 0.316 }
+]
+```
+
+**Example**
+
+```
+GET /api/stats
+```
+
+```json
+[
+  { "jerseyNumber": 4,  "name": "Tate Hoehns", "gamesPlayed": 30, "atBats": 28, "hits": 12, "doubles": 3, "triples": 1, "homeRuns": 2, "rbi": 14, "runs": 15, "walks": 6, "strikeouts": 9, "stolenBases": 5, "battingAvg": 0.429 },
+  { "jerseyNumber": 7,  "name": "Sam Diaz",     "gamesPlayed": 30, "atBats": 40, "hits": 0,  "doubles": 0, "triples": 0, "homeRuns": 0, "rbi": 0,  "runs": 1,  "walks": 2, "strikeouts": 18, "stolenBases": 0, "battingAvg": 0.000 }
+]
+```
+
+---
+
+### Get stats by jersey number
+
+```
+GET /api/stats/{number}
+```
+
+**Path parameters**
+
+| Name     | Type   | Required | Description             |
+|----------|--------|----------|--------------------------|
+| `number` | number | Yes      | Player's jersey number. |
+
+**Response — 200 OK**
+
+```json
+{ "jerseyNumber": 4, "name": "Tate Hoehns", "gamesPlayed": 30, "atBats": 28, "hits": 12, "doubles": 3, "triples": 1, "homeRuns": 2, "rbi": 14, "runs": 15, "walks": 6, "strikeouts": 9, "stolenBases": 5, "battingAvg": 0.429 }
+```
+
+**Response fields**
+
+| Field          | Type    | Description                                                              |
+|----------------|---------|---------------------------------------------------------------------------|
+| `jerseyNumber` | number  | Unique jersey number (natural key).                                      |
+| `name`         | string  | `firstName + " " + lastName`.                                            |
+| `gamesPlayed`  | number  | Games played.                                                            |
+| `atBats`       | number  | At-bats.                                                                 |
+| `hits`         | number  | Hits.                                                                    |
+| `doubles`      | number  | Doubles.                                                                 |
+| `triples`      | number  | Triples.                                                                 |
+| `homeRuns`     | number  | Home runs.                                                               |
+| `rbi`          | number  | Runs batted in.                                                          |
+| `runs`         | number  | Runs scored.                                                             |
+| `walks`        | number  | Walks (bases on balls).                                                  |
+| `strikeouts`   | number  | Strikeouts.                                                              |
+| `stolenBases`  | number  | Stolen bases.                                                            |
+| `battingAvg`   | number  | `hits ÷ atBats`, rounded to 3 decimal places. `0.000` when `atBats` is 0 — never a divide-by-zero, `NaN`, or `Infinity`. |
+
+**Example**
+
+```
+GET /api/stats/4
+```
+
+```json
+{ "jerseyNumber": 4, "name": "Tate Hoehns", "gamesPlayed": 30, "atBats": 28, "hits": 12, "doubles": 3, "triples": 1, "homeRuns": 2, "rbi": 14, "runs": 15, "walks": 6, "strikeouts": 9, "stolenBases": 5, "battingAvg": 0.429 }
+```
+
+```
+GET /api/stats/92
+```
+
+```json
+{ "jerseyNumber": 92, "name": "Ricky Nash", "gamesPlayed": 30, "atBats": 95, "hits": 30, "doubles": 4, "triples": 2, "homeRuns": 1, "rbi": 18, "runs": 40, "walks": 12, "strikeouts": 20, "stolenBases": 41, "battingAvg": 0.316 }
+```
+
+**Error cases**
+
+| Status | Condition                                |
+|--------|-------------------------------------------|
+| 404    | No player exists with that jersey number. |
+
