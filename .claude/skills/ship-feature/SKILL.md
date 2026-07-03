@@ -4,7 +4,8 @@ description: >
   Use when building a feature end-to-end from a written spec with this project's
   sub-agent team — asks like "build the feature in docs/<x>-spec.md" or "ship the
   feature in the spec". Orchestrates the developer, tester, reviewers, and
-  doc-writer through build → test → review → PR → CI → address-review → ship.
+  doc-writer through build → test → review → PR → CI → address-review → verify
+  live → notify.
 ---
 
 # Ship a Feature (team orchestration)
@@ -127,8 +128,34 @@ poll `gh` on an interval until the review lands.
     remaining threads with your decision, resolve them, and move on. Never loop
     unbounded.
 
+## Verify it actually runs
+
+12. **Prove the feature works end-to-end against a running app** — green tests
+    are necessary but not sufficient. Boot the app on **port 8081** (never 8080),
+    wait until it's ready, then exercise the feature's endpoints from the spec's
+    acceptance examples and capture the REAL responses. Best-effort: if it can't
+    boot, say so and continue — do **not** fail the run over this.
+
+    ```bash
+    SERVER_PORT=8081 ./gradlew bootRun > /tmp/dugout-verify.log 2>&1 &
+    APP=$!
+    # poll readiness against one of the feature's endpoints (up to ~60s)
+    for i in $(seq 1 30); do curl -sf localhost:8081/<an-endpoint> >/dev/null && break; sleep 2; done
+    curl -s localhost:8081/<endpoint-from-acceptance-example>   # e.g. /api/stats/4
+    curl -s localhost:8081/<list-endpoint>                       # e.g. /api/stats
+    kill "$APP" 2>/dev/null
+    ```
+
+    Post the captured JSON as a PR comment so a reviewer sees reality, not just a
+    passing test — and call out any drift you notice between the live response and
+    the spec/`docs/api.md`:
+    `gh pr comment "$PR" --body "✅ Verified live on a running instance: …"`
+
 ## Wrap up
 
-12. **Notify.** Post a short summary: the PR link, final **CI status**, how many
-    Copilot comments you addressed vs. declined (with reasons), and the final
-    commit sha. This is the "come back from lunch" report.
+13. **Notify — ping the human.** Post the come-back-from-lunch summary as a PR
+    comment that **@mentions the repo owner** (`@kylehoehns`) so it fires a mobile
+    notification — the "review it from my phone" handoff. Include: the PR link,
+    final **CI status**, Copilot comments addressed vs. declined (with reasons),
+    the **live-verified snippet** from step 12, and the final commit sha.
+    `gh pr comment "$PR" --body "@kylehoehns 🍱 Come-back-from-lunch report — …"`
