@@ -1,6 +1,7 @@
 package com.kylehoehns.dugout.stats;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 import java.util.Optional;
@@ -56,5 +57,18 @@ class RosterStatsLoaderIT {
 		// then
 		assertThat(count).isEqualTo(1);
 		assertThat(playerStatsRepository.findById(4)).isEmpty();
+	}
+
+	@Test
+	@DisplayName("throws an illegal state exception when a CSV row has fewer than 14 columns")
+	void should_throw_illegal_state_exception_when_row_has_too_few_columns() {
+		// given
+		String malformedLine = "1,Jane,Doe";
+
+		// when / then
+		assertThatThrownBy(() -> rosterStatsLoader.parseLine(malformedLine))
+			.isInstanceOf(IllegalStateException.class)
+			.hasMessageContaining("roster-stats.csv")
+			.hasMessageContaining("14 columns");
 	}
 }

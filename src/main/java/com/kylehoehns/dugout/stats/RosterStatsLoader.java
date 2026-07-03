@@ -43,19 +43,18 @@ public class RosterStatsLoader implements CommandLineRunner {
                 if (line.isBlank()) {
                     continue;
                 }
-                PlayerStats parsed = parseLine(line);
-                if (parsed != null) {
-                    stats.add(parsed);
-                }
+                stats.add(parseLine(line));
             }
         }
         return stats;
     }
 
-    private PlayerStats parseLine(String line) {
+    PlayerStats parseLine(String line) {
         String[] fields = line.split(",", -1);
         if (fields.length < 14) {
-            return null;
+            throw new IllegalStateException(
+                "Malformed row in " + CSV_FILE + ": expected at least 14 columns but found "
+                    + fields.length + ". Offending line: " + line);
         }
         for (int i = 0; i < fields.length; i++) {
             fields[i] = fields[i].trim();
