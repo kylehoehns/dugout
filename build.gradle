@@ -76,9 +76,7 @@ tasks.named('check') {
 spotless {
     java {
         target 'src/**/*.java'
-        importOrder()
+        googleJavaFormat('1.35.0').aosp()
         removeUnusedImports()
-        trimTrailingWhitespace()
-        endWithNewline()
     }
 }
