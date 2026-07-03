@@ -17,11 +17,11 @@ public record PlayerStatsResponse(
         Integer walks,
         Integer strikeouts,
         Integer stolenBases,
-        double battingAvg) {
+        BigDecimal battingAvg) {
 
     public static PlayerStatsResponse from(PlayerStats stats) {
         String name = stats.getFirstName() + " " + stats.getLastName();
-        double battingAvg = computeBattingAvg(stats.getHits(), stats.getAtBats());
+        BigDecimal battingAvg = computeBattingAvg(stats.getHits(), stats.getAtBats());
         return new PlayerStatsResponse(
                 stats.getJerseyNumber(),
                 name,
@@ -39,12 +39,10 @@ public record PlayerStatsResponse(
                 battingAvg);
     }
 
-    private static double computeBattingAvg(Integer hits, Integer atBats) {
+    private static BigDecimal computeBattingAvg(Integer hits, Integer atBats) {
         if (atBats == null || atBats == 0 || hits == null) {
-            return 0.000;
+            return BigDecimal.ZERO.setScale(3, RoundingMode.HALF_UP);
         }
-        return BigDecimal.valueOf(hits)
-                .divide(BigDecimal.valueOf(atBats), 3, RoundingMode.HALF_UP)
-                .doubleValue();
+        return BigDecimal.valueOf(hits).divide(BigDecimal.valueOf(atBats), 3, RoundingMode.HALF_UP);
     }
 }

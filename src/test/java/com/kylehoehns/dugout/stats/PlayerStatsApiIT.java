@@ -3,6 +3,7 @@ package com.kylehoehns.dugout.stats;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
+import java.math.BigDecimal;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -71,7 +72,7 @@ class PlayerStatsApiIT {
         assertThat(result.name()).isEqualTo("Tate Hoehns");
         assertThat(result.atBats()).isEqualTo(28);
         assertThat(result.hits()).isEqualTo(12);
-        assertThat(result.battingAvg()).isEqualTo(0.429);
+        assertThat(result.battingAvg()).isEqualByComparingTo(new BigDecimal("0.429"));
     }
 
     @Test
@@ -107,7 +108,7 @@ class PlayerStatsApiIT {
         assertThat(response.getStatus()).isEqualTo(200);
         assertThat(result.atBats()).isEqualTo(0);
         assertThat(result.hits()).isEqualTo(0);
-        assertThat(result.battingAvg()).isEqualTo(0.0);
+        assertThat(result.battingAvg()).isEqualByComparingTo(new BigDecimal("0.000"));
     }
 
     @Test
@@ -127,7 +128,7 @@ class PlayerStatsApiIT {
                 objectMapper.readValue(response.getContentAsString(), PlayerStatsResponse.class);
 
         assertThat(result.name()).isEqualTo("Tate Hoehns");
-        assertThat(result.battingAvg()).isEqualTo(0.429);
+        assertThat(result.battingAvg()).isEqualByComparingTo(new BigDecimal("0.429"));
 
         var otherResponse =
                 mockMvc.perform(get("/api/stats/{number}", 92)).andReturn().getResponse();

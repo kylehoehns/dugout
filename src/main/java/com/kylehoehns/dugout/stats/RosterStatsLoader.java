@@ -55,7 +55,7 @@ public class RosterStatsLoader implements CommandLineRunner {
 
     private PlayerStats parseLine(String line) {
         String[] fields = line.split(",", -1);
-        if (fields.length < 14) {
+        if (fields.length != 14) {
             return null;
         }
         for (int i = 0; i < fields.length; i++) {
