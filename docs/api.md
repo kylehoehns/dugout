@@ -138,3 +138,81 @@ Content-Type: application/json
 
 { "id": 4, "name": "Roberto Clemente", "position": "RF" }
 ```
+
+---
+
+## Roster batting stats
+
+Batting stats for a roster seeded from a CSV file on startup
+(`src/main/resources/roster-stats.csv`). This is additive and does not change
+the `Player` entity or the `/api/players` endpoints above.
+
+### `PlayerStatsResponse` shape
+
+| Field          | Type    | Description                                              |
+|----------------|---------|-----------------------------------------------------------|
+| `jerseyNumber` | number  | Unique jersey number (natural key).                       |
+| `name`         | string  | `firstName + " " + lastName`.                              |
+| `gamesPlayed`  | number  | Games played.                                              |
+| `atBats`       | number  | At-bats.                                                   |
+| `hits`         | number  | Hits.                                                      |
+| `doubles`      | number  | Doubles (2B).                                              |
+| `triples`      | number  | Triples (3B).                                              |
+| `homeRuns`     | number  | Home runs.                                                 |
+| `rbi`          | number  | Runs batted in.                                            |
+| `runs`         | number  | Runs scored.                                               |
+| `walks`        | number  | Walks (BB).                                                |
+| `strikeouts`   | number  | Strikeouts (SO).                                           |
+| `stolenBases`  | number  | Stolen bases.                                              |
+| `battingAvg`   | number  | Computed: `hits ÷ atBats`, rounded to 3 decimal places. A player with 0 at-bats returns `0.000` (never a divide-by-zero, `NaN`, or `Infinity`). |
+
+### List all stats
+
+Returns every player's batting stats, sorted by `battingAvg` descending.
+
+```
+GET /api/stats
+```
+
+**Response — 200 OK**
+
+```json
+[
+  { "jerseyNumber": 92, "name": "Cooper Lane", "gamesPlayed": 23, "atBats": 45, "hits": 26, "doubles": 2, "triples": 0, "homeRuns": 0, "rbi": 4, "runs": 37, "walks": 18, "strikeouts": 9, "stolenBases": 41, "battingAvg": 0.578 },
+  { "jerseyNumber": 4,  "name": "Tate Hoehns",  "gamesPlayed": 16, "atBats": 28, "hits": 12, "doubles": 1, "triples": 0, "homeRuns": 0, "rbi": 10, "runs": 17, "walks": 9,  "strikeouts": 8, "stolenBases": 20, "battingAvg": 0.429 }
+]
+```
+
+### Get stats by jersey number
+
+```
+GET /api/stats/{number}
+```
+
+**Path parameters**
+
+| Name     | Type   | Required | Description       |
+|----------|--------|----------|--------------------|
+| `number` | number | Yes      | Player's jersey number. |
+
+**Response — 200 OK**
+
+```json
+{ "jerseyNumber": 4, "name": "Tate Hoehns", "gamesPlayed": 16, "atBats": 28, "hits": 12, "doubles": 1, "triples": 0, "homeRuns": 0, "rbi": 10, "runs": 17, "walks": 9, "strikeouts": 8, "stolenBases": 20, "battingAvg": 0.429 }
+```
+
+**Example**
+
+```
+GET /api/stats/92
+```
+
+```json
+{ "jerseyNumber": 92, "name": "Cooper Lane", "gamesPlayed": 23, "atBats": 45, "hits": 26, "doubles": 2, "triples": 0, "homeRuns": 0, "rbi": 4, "runs": 37, "walks": 18, "strikeouts": 9, "stolenBases": 41, "battingAvg": 0.578 }
+```
+
+**Error cases**
+
+| Status | Condition                          |
+|--------|-------------------------------------|
+| 404    | No player exists with that jersey number |
