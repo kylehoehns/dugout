@@ -46,6 +46,10 @@ public class RosterStatsLoader implements CommandLineRunner {
 
     private PlayerStats parseLine(String line) {
         String[] fields = line.split(",", -1);
+        if (fields.length != 14) {
+            throw new IllegalStateException(
+                "Malformed roster-stats.csv row (expected 14 fields, got " + fields.length + "): " + line);
+        }
         for (int i = 0; i < fields.length; i++) {
             fields[i] = fields[i].trim();
         }

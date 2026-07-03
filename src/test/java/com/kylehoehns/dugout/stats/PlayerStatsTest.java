@@ -45,4 +45,18 @@ class PlayerStatsTest {
 		assertThat(stats.getStrikeouts()).isEqualTo(8);
 		assertThat(stats.getStolenBases()).isEqualTo(20);
 	}
+
+	@Test
+	@DisplayName("returns a zero batting average when hits is null even though at-bats is non-zero")
+	void should_return_zero_batting_avg_when_hits_is_null() {
+		// given
+		var stats = new PlayerStats(
+			4, "Tate", "Hoehns", 16, 28, null, 1, 0, 0, 10, 17, 9, 8, 20);
+
+		// when
+		var response = PlayerStatsResponse.from(stats);
+
+		// then
+		assertThat(response.battingAvg()).isEqualTo(0.0);
+	}
 }
