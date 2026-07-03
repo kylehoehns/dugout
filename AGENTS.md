@@ -8,5 +8,6 @@
 
 ## Rules (most-violated first)
 - This is a **Gradle** project — build and test with `./gradlew`, never Maven (`mvn`).
+- Do not skip tests when building (`-x test`);
 - Do not add Lombok; use plain Java.
 - JPA entities are plain classes (a record cannot be an `@Entity`); use records for DTOs.
