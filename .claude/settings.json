@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Bash(./gradlew:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(gh pr:*)",
+      "Bash(gh run:*)",
+      "Bash(gh repo view:*)",
+      "Bash(gh api graphql:*)"
     ]
   }
 }
