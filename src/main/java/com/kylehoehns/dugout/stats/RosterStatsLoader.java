@@ -52,25 +52,53 @@ public class RosterStatsLoader implements CommandLineRunner {
         return roster;
     }
 
+    private static final int EXPECTED_COLUMN_COUNT = 14;
+
     private PlayerStats parseLine(String line) {
         String[] fields = line.split(",", -1);
         for (int i = 0; i < fields.length; i++) {
             fields[i] = fields[i].trim();
         }
+        if (fields.length != EXPECTED_COLUMN_COUNT) {
+            throw new IllegalStateException(
+                    CSV_PATH
+                            + ": expected "
+                            + EXPECTED_COLUMN_COUNT
+                            + " columns but found "
+                            + fields.length
+                            + " in row: "
+                            + line);
+        }
         return new PlayerStats(
-                Integer.parseInt(fields[0]),
+                parseInt(fields[0], "jerseyNumber", line),
                 fields[1],
                 fields[2],
-                Integer.parseInt(fields[3]),
-                Integer.parseInt(fields[4]),
-                Integer.parseInt(fields[5]),
-                Integer.parseInt(fields[6]),
-                Integer.parseInt(fields[7]),
-                Integer.parseInt(fields[8]),
-                Integer.parseInt(fields[9]),
-                Integer.parseInt(fields[10]),
-                Integer.parseInt(fields[11]),
-                Integer.parseInt(fields[12]),
-                Integer.parseInt(fields[13]));
+                parseInt(fields[3], "gamesPlayed", line),
+                parseInt(fields[4], "atBats", line),
+                parseInt(fields[5], "hits", line),
+                parseInt(fields[6], "doubles", line),
+                parseInt(fields[7], "triples", line),
+                parseInt(fields[8], "homeRuns", line),
+                parseInt(fields[9], "rbi", line),
+                parseInt(fields[10], "runs", line),
+                parseInt(fields[11], "walks", line),
+                parseInt(fields[12], "strikeouts", line),
+                parseInt(fields[13], "stolenBases", line));
+    }
+
+    private int parseInt(String value, String fieldName, String line) {
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            throw new IllegalStateException(
+                    CSV_PATH
+                            + ": could not parse "
+                            + fieldName
+                            + " (value: '"
+                            + value
+                            + "') in row: "
+                            + line,
+                    e);
+        }
     }
 }
