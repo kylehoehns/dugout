@@ -43,3 +43,4 @@ out/
 
 # Planning brief — local only, never commit (would spoil the per-stage demo)
 dugout-talk-brief*.md
+.playwright-mcp/
