@@ -17,7 +17,7 @@ public record PlayerStatsResponse(
         Integer walks,
         Integer strikeouts,
         Integer stolenBases,
-        double battingAvg) {
+        BigDecimal battingAvg) {
 
     public static PlayerStatsResponse from(PlayerStats stats) {
         return new PlayerStatsResponse(
@@ -37,12 +37,11 @@ public record PlayerStatsResponse(
                 computeBattingAvg(stats.getHits(), stats.getAtBats()));
     }
 
-    private static double computeBattingAvg(Integer hits, Integer atBats) {
+    private static BigDecimal computeBattingAvg(Integer hits, Integer atBats) {
         if (atBats == null || atBats == 0) {
-            return 0.000;
+            return BigDecimal.ZERO.setScale(3);
         }
         return BigDecimal.valueOf(hits == null ? 0 : hits)
-                .divide(BigDecimal.valueOf(atBats), 3, RoundingMode.HALF_UP)
-                .doubleValue();
+                .divide(BigDecimal.valueOf(atBats), 3, RoundingMode.HALF_UP);
     }
 }

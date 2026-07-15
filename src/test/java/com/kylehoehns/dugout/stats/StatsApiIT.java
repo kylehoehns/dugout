@@ -3,6 +3,7 @@ package com.kylehoehns.dugout.stats;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -68,13 +69,12 @@ class StatsApiIT {
         // then
         assertThat(response.getStatus()).isEqualTo(200);
         assertThat(stats).hasSize(12);
-        assertThat(stats)
-                .isSortedAccordingTo((a, b) -> Double.compare(b.battingAvg(), a.battingAvg()));
+        assertThat(stats).isSortedAccordingTo((a, b) -> b.battingAvg().compareTo(a.battingAvg()));
         assertThat(stats[0].battingAvg())
                 .isEqualTo(
                         Arrays.stream(stats)
-                                .mapToDouble(PlayerStatsResponse::battingAvg)
-                                .max()
+                                .map(PlayerStatsResponse::battingAvg)
+                                .max(BigDecimal::compareTo)
                                 .orElseThrow());
     }
 
@@ -94,7 +94,7 @@ class StatsApiIT {
         assertThat(result.name()).isEqualTo("Tate Hoehns");
         assertThat(result.atBats()).isEqualTo(28);
         assertThat(result.hits()).isEqualTo(12);
-        assertThat(result.battingAvg()).isEqualTo(0.429);
+        assertThat(result.battingAvg()).isEqualByComparingTo(new BigDecimal("0.429"));
     }
 
     @Test
@@ -171,7 +171,7 @@ class StatsApiIT {
         assertThat(result.walks()).isEqualTo(4);
         assertThat(result.strikeouts()).isEqualTo(9);
         assertThat(result.stolenBases()).isEqualTo(8);
-        assertThat(result.battingAvg()).isEqualTo(0.25);
+        assertThat(result.battingAvg()).isEqualByComparingTo(new BigDecimal("0.250"));
     }
 
     @Test
@@ -189,6 +189,6 @@ class StatsApiIT {
         // then
         assertThat(response.getStatus()).isEqualTo(200);
         assertThat(result.atBats()).isEqualTo(0);
-        assertThat(result.battingAvg()).isEqualTo(0.000);
+        assertThat(result.battingAvg()).isEqualByComparingTo(new BigDecimal("0.000"));
     }
 }

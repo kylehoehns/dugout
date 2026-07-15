@@ -46,10 +46,7 @@ public class RosterStatsLoader implements CommandLineRunner {
                 if (line.isBlank()) {
                     continue;
                 }
-                PlayerStats playerStats = parseLine(line);
-                if (playerStats != null) {
-                    roster.add(playerStats);
-                }
+                roster.add(parseLine(line));
             }
         }
         return roster;
@@ -58,7 +55,8 @@ public class RosterStatsLoader implements CommandLineRunner {
     private PlayerStats parseLine(String line) {
         String[] fields = line.split(",", -1);
         if (fields.length < 14) {
-            return null;
+            throw new IllegalStateException(
+                    "Malformed roster-stats.csv row (expected 14 columns): " + line);
         }
         for (int i = 0; i < fields.length; i++) {
             fields[i] = fields[i].trim();

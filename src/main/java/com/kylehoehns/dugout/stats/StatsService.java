@@ -18,7 +18,7 @@ public class StatsService {
     public List<PlayerStatsResponse> getAllStats() {
         return playerStatsRepository.findAll().stream()
                 .map(PlayerStatsResponse::from)
-                .sorted(Comparator.comparingDouble(PlayerStatsResponse::battingAvg).reversed())
+                .sorted(Comparator.comparing(PlayerStatsResponse::battingAvg).reversed())
                 .toList();
     }
 
