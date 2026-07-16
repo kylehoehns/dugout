@@ -138,3 +138,134 @@ Content-Type: application/json
 
 { "id": 4, "name": "Roberto Clemente", "position": "RF" }
 ```
+
+---
+
+## Stats
+
+Roster batting stats, seeded from a CSV file on startup. Jersey number is the
+natural key. This is additive and does not affect the `Player` entity or the
+`/api/players` endpoints above.
+
+### List all players' stats
+
+Returns every player's batting stats, **sorted by `battingAvg` descending**.
+
+```
+GET /api/stats
+```
+
+**Response — 200 OK**
+
+An array of stats objects.
+
+```json
+[
+  {
+    "jerseyNumber": 4,
+    "name": "Tate Hoehns",
+    "gamesPlayed": 20,
+    "atBats": 28,
+    "hits": 12,
+    "doubles": 3,
+    "triples": 0,
+    "homeRuns": 2,
+    "rbi": 9,
+    "runs": 11,
+    "walks": 5,
+    "strikeouts": 6,
+    "stolenBases": 4,
+    "battingAvg": 0.429
+  },
+  {
+    "jerseyNumber": 92,
+    "name": "Casey Hoehns",
+    "gamesPlayed": 18,
+    "atBats": 30,
+    "hits": 0,
+    "doubles": 0,
+    "triples": 0,
+    "homeRuns": 0,
+    "rbi": 0,
+    "runs": 2,
+    "walks": 1,
+    "strikeouts": 10,
+    "stolenBases": 41,
+    "battingAvg": 0.000
+  }
+]
+```
+
+**Example**
+
+```
+GET /api/stats
+```
+
+```
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+[
+  { "jerseyNumber": 4, "name": "Tate Hoehns", "gamesPlayed": 20, "atBats": 28, "hits": 12,
+    "doubles": 3, "triples": 0, "homeRuns": 2, "rbi": 9, "runs": 11, "walks": 5,
+    "strikeouts": 6, "stolenBases": 4, "battingAvg": 0.429 }
+]
+```
+
+---
+
+### Get stats by jersey number
+
+```
+GET /api/stats/{number}
+```
+
+**Path parameters**
+
+| Name     | Type   | Required | Description                          |
+|----------|--------|----------|--------------------------------------|
+| `number` | number | Yes      | Player's jersey number (natural key). |
+
+**Response — 200 OK**
+
+```json
+{
+  "jerseyNumber": 4,
+  "name": "Tate Hoehns",
+  "gamesPlayed": 20,
+  "atBats": 28,
+  "hits": 12,
+  "doubles": 3,
+  "triples": 0,
+  "homeRuns": 2,
+  "rbi": 9,
+  "runs": 11,
+  "walks": 5,
+  "strikeouts": 6,
+  "stolenBases": 4,
+  "battingAvg": 0.429
+}
+```
+
+**`battingAvg`**
+
+Computed as `hits ÷ atBats`, rounded to 3 decimal places (half-up). A player
+with 0 at-bats returns `0.000` rather than a divide-by-zero, `NaN`, or
+`Infinity`.
+
+**Error cases**
+
+| Status | Condition                              |
+|--------|-----------------------------------------|
+| 404    | No player stats exist for that jersey number |
+
+**Example — unknown jersey number**
+
+```
+GET /api/stats/777
+```
+
+```
+HTTP/1.1 404 Not Found
+```
