@@ -83,7 +83,7 @@ public class RosterStatsLoader implements CommandLineRunner {
 
     private PlayerStats parseLine(String line) {
         String[] fields = line.split(",", -1);
-        if (fields.length < EXPECTED_COLUMN_COUNT) {
+        if (fields.length != EXPECTED_COLUMN_COUNT) {
             log.warn(
                     "Skipping malformed roster-stats.csv row: expected {} columns but found {} in"
                             + " line \"{}\"",
