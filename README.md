@@ -1,5 +1,7 @@
 # dugout
 
+[![CI](https://github.com/kylehoehns/dugout/actions/workflows/ci.yml/badge.svg)](https://github.com/kylehoehns/dugout/actions/workflows/ci.yml)
+
 Companion repo for the talk **"From Sidebar to Sub-Agents: A Live, Hands-On Intro to Building with AI Agents."**
 
 **Slides:** [www.kylehoehns.com/talks/sidebar-to-subagents](https://www.kylehoehns.com/talks/sidebar-to-subagents)
@@ -59,6 +61,10 @@ git checkout stage-3   # jump to any level on your own machine
 
 Check out a level, [run it](#run-it), then type these into your AI assistant to
 reproduce what the level demonstrates.
+
+> **Which assistant?** Levels 1–3 work with any AI coding assistant. Levels 4–8
+> use **Claude Code** features — skills (in `.claude/skills/`) and slash commands
+> like `/ship-feature` — so follow those along with Claude Code.
 
 **Level 1 — ask in the sidebar (the AI advises; you make the edits):**
 > How do I add an endpoint to return a single player by id from this hardcoded list?
