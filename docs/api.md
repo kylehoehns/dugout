@@ -249,6 +249,77 @@ HTTP/1.1 404 Not Found
 
 ---
 
+### Get team season summary
+
+Returns a single top-line team batting average plus the roster's "real
+contributors" (see eligibility below), ordered so the hits leader is first.
+
+```
+GET /api/stats/team
+```
+
+`/api/stats/team` is a literal path and takes precedence over
+`GET /api/stats/{number}` above, so there is no collision.
+
+**Response — 200 OK**
+
+| Field            | Type   | Description                                        |
+|------------------|--------|-----------------------------------------------------|
+| `teamBattingAvg` | number | Team hits ÷ team at-bats over eligible players, 3 decimals. |
+| `players`        | array  | Eligible players' stats, each shaped like the `/api/stats` entries above, ordered as described below. |
+
+**Eligibility** — only players with `atBats >= 10` count as "real
+contributors". Ineligible players are excluded from both `players` and the
+`teamBattingAvg` calculation.
+
+**`teamBattingAvg`** — the *true* team average: total hits ÷ total at-bats
+across eligible players (not the mean of individual averages). Computed as a
+`BigDecimal`, scale 3, `HALF_UP` rounding — same convention as the per-player
+`battingAvg` described in [Batting average](#batting-average) below.
+
+**Ordering of `players`**
+
+1. The **hits leader** (eligible player with the most hits) is pinned first.
+   Ties broken by higher `battingAvg`, then lower `jerseyNumber`.
+2. Everyone else follows by `battingAvg` descending, then `jerseyNumber`
+   ascending. This is intentionally not a pure average sort — the hits
+   leader can sit above a higher-average teammate.
+
+**Example**
+
+```
+GET /api/stats/team
+```
+
+```json
+{
+  "teamBattingAvg": 0.438,
+  "players": [
+    { "jerseyNumber": 92, "name": "Cooper Lane", "gamesPlayed": 23, "atBats": 45, "hits": 26, "doubles": 2,  "triples": 0, "homeRuns": 0, "rbi": 4,  "runs": 37, "walks": 18, "strikeouts": 9, "stolenBases": 41, "battingAvg": 0.578 },
+    { "jerseyNumber": 23, "name": "Mason Reed",  "gamesPlayed": 23, "atBats": 41, "hits": 25, "doubles": 10, "triples": 0, "homeRuns": 0, "rbi": 20, "runs": 25, "walks": 12, "strikeouts": 1, "stolenBases": 13, "battingAvg": 0.610 },
+    ...
+  ]
+}
+```
+
+Note that `players[1]`'s `battingAvg` (0.610) is higher than `players[0]`'s
+(0.578) — Cooper Lane is pinned first as the hits leader (26 hits) even
+though Mason Reed has the better average.
+
+**Example — empty or no eligible players**
+
+```
+GET /api/stats/team
+```
+
+```json
+{ "teamBattingAvg": 0.000, "players": [] }
+```
+
+Still returns HTTP 200 (never a divide-by-zero).
+
+---
+
 ### Batting average
 
 `battingAvg` is computed on every read (not stored) as **hits ÷ at-bats**,

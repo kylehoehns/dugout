@@ -21,6 +21,11 @@ public class PlayerStatsController {
         return playerStatsService.getAllPlayerStats();
     }
 
+    @GetMapping("/team")
+    public TeamStatsResponse getTeamStats() {
+        return playerStatsService.getTeamStats();
+    }
+
     @GetMapping("/{number}")
     public PlayerStatsResponse getPlayerStatsByJerseyNumber(@PathVariable Integer number) {
         return playerStatsService.getPlayerStatsByJerseyNumber(number);
