@@ -86,7 +86,7 @@ reproduce what the level demonstrates.
 > Ship the feature in `docs/roster-stats-spec.md`.
 
 **Level 8 — the team starts from a GitHub issue:**
-> Ship the feature in issue #8.
+> /ship-feature 14
 
 </details>
 
