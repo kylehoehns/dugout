@@ -249,6 +249,70 @@ HTTP/1.1 404 Not Found
 
 ---
 
+### Team summary
+
+Returns a whole-team batting summary: a pooled team batting average plus the
+roster ordered by hits. Only **qualified** players (`atBats >= 10`) are
+included and count toward the average — this guards against small-sample
+lines (e.g. a 1-for-1 game) skewing the numbers.
+
+```
+GET /api/stats/team-summary
+```
+
+**Response — 200 OK**
+
+| Field            | Type    | Description                                                        |
+|-------------------|---------|--------------------------------------------------------------------|
+| `teamBattingAvg`  | number  | Pooled Σhits ÷ Σat-bats over qualified players, rounded to 3 decimal places with `HALF_UP` (see [Batting average](#batting-average)). `0.000` when no player qualifies. |
+| `players`         | array   | Qualified players only, each the same object shape as [`GET /api/stats`](#list-all-player-stats) entries (`jerseyNumber`, `name`, `gamesPlayed`, `atBats`, `hits`, `doubles`, `triples`, `homeRuns`, `rbi`, `runs`, `walks`, `strikeouts`, `stolenBases`, `battingAvg`). |
+
+`players` is sorted:
+
+1. `hits` descending (most hits first).
+2. tie → `battingAvg` descending.
+3. tie → `jerseyNumber` ascending.
+
+No "hot/cold" tag is included — the data has no time-series dimension, so
+recent form isn't computable (see `docs/adr/0002-omit-hot-cold-tag.md`).
+
+**Example**
+
+```
+GET /api/stats/team-summary
+```
+
+```json
+{
+  "teamBattingAvg": 0.438,
+  "players": [
+    { "jerseyNumber": 92, "name": "Cooper Lane",  "gamesPlayed": 23, "atBats": 45, "hits": 26, "doubles": 2,  "triples": 0, "homeRuns": 0, "rbi": 4,  "runs": 37, "walks": 18, "strikeouts": 9,  "stolenBases": 41, "battingAvg": 0.578 },
+    { "jerseyNumber": 23, "name": "Mason Reed",   "gamesPlayed": 23, "atBats": 41, "hits": 25, "doubles": 10, "triples": 0, "homeRuns": 0, "rbi": 20, "runs": 25, "walks": 12, "strikeouts": 1,  "stolenBases": 13, "battingAvg": 0.610 },
+    { "jerseyNumber": 11, "name": "Carter Hale",  "gamesPlayed": 23, "atBats": 51, "hits": 23, "doubles": 6,  "triples": 1, "homeRuns": 0, "rbi": 22, "runs": 27, "walks": 12, "strikeouts": 11, "stolenBases": 20, "battingAvg": 0.451 },
+    { "jerseyNumber": 64, "name": "Landon Cross", "gamesPlayed": 23, "atBats": 43, "hits": 21, "doubles": 3,  "triples": 0, "homeRuns": 0, "rbi": 18, "runs": 27, "walks": 13, "strikeouts": 10, "stolenBases": 26, "battingAvg": 0.488 },
+    { "jerseyNumber": 86, "name": "Easton Gray",  "gamesPlayed": 23, "atBats": 35, "hits": 17, "doubles": 0,  "triples": 1, "homeRuns": 0, "rbi": 11, "runs": 27, "walks": 18, "strikeouts": 11, "stolenBases": 29, "battingAvg": 0.486 },
+    { "jerseyNumber": 99, "name": "Nolan Pierce", "gamesPlayed": 23, "atBats": 43, "hits": 15, "doubles": 1,  "triples": 0, "homeRuns": 0, "rbi": 22, "runs": 19, "walks": 12, "strikeouts": 12, "stolenBases": 17, "battingAvg": 0.349 },
+    { "jerseyNumber": 36, "name": "Owen Bell",    "gamesPlayed": 21, "atBats": 27, "hits": 14, "doubles": 0,  "triples": 0, "homeRuns": 0, "rbi": 8,  "runs": 17, "walks": 7,  "strikeouts": 5,  "stolenBases": 22, "battingAvg": 0.519 },
+    { "jerseyNumber": 16, "name": "Brody Vance",  "gamesPlayed": 20, "atBats": 38, "hits": 14, "doubles": 4,  "triples": 0, "homeRuns": 0, "rbi": 13, "runs": 18, "walks": 9,  "strikeouts": 18, "stolenBases": 16, "battingAvg": 0.368 },
+    { "jerseyNumber": 4,  "name": "Tate Hoehns",  "gamesPlayed": 16, "atBats": 28, "hits": 12, "doubles": 1,  "triples": 0, "homeRuns": 0, "rbi": 10, "runs": 17, "walks": 9,  "strikeouts": 8,  "stolenBases": 20, "battingAvg": 0.429 },
+    { "jerseyNumber": 12, "name": "Silas Fox",    "gamesPlayed": 22, "atBats": 35, "hits": 9,  "doubles": 1,  "triples": 0, "homeRuns": 0, "rbi": 3,  "runs": 14, "walks": 11, "strikeouts": 21, "stolenBases": 8,  "battingAvg": 0.257 },
+    { "jerseyNumber": 45, "name": "Jonah West",   "gamesPlayed": 23, "atBats": 29, "hits": 8,  "doubles": 1,  "triples": 0, "homeRuns": 0, "rbi": 5,  "runs": 20, "walks": 22, "strikeouts": 19, "stolenBases": 17, "battingAvg": 0.276 },
+    { "jerseyNumber": 1,  "name": "Micah Flynn",  "gamesPlayed": 14, "atBats": 21, "hits": 7,  "doubles": 0,  "triples": 0, "homeRuns": 0, "rbi": 4,  "runs": 10, "walks": 6,  "strikeouts": 9,  "stolenBases": 8,  "battingAvg": 0.333 }
+  ]
+}
+```
+
+Above, jerseys `#36` (Owen Bell, 14 hits, 0.519) and `#16` (Brody Vance, 14
+hits, 0.368) tie on hits, so the higher `battingAvg` sorts first.
+
+**Error cases**
+
+None specific to this endpoint — it always returns `200 OK` with `players: []`
+and `teamBattingAvg: 0.000` when no player qualifies (e.g. an empty roster or
+every player below the `atBats >= 10` threshold).
+
+---
+
 ### Batting average
 
 `battingAvg` is computed on every read (not stored) as **hits ÷ at-bats**,

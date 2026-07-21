@@ -19,8 +19,8 @@ public record PlayerStatsResponse(
         Integer stolenBases,
         BigDecimal battingAvg) {
 
-    private static final int BATTING_AVG_SCALE = 3;
-    private static final RoundingMode BATTING_AVG_ROUNDING = RoundingMode.HALF_UP;
+    static final int BATTING_AVG_SCALE = 3;
+    static final RoundingMode BATTING_AVG_ROUNDING = RoundingMode.HALF_UP;
 
     public static PlayerStatsResponse from(PlayerStats stats) {
         return new PlayerStatsResponse(
@@ -40,7 +40,7 @@ public record PlayerStatsResponse(
                 battingAverage(stats.getHits(), stats.getAtBats()));
     }
 
-    private static BigDecimal battingAverage(Integer hits, Integer atBats) {
+    static BigDecimal battingAverage(Integer hits, Integer atBats) {
         if (atBats == null || atBats == 0) {
             return BigDecimal.ZERO.setScale(BATTING_AVG_SCALE, BATTING_AVG_ROUNDING);
         }

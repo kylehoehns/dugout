@@ -25,4 +25,9 @@ public class PlayerStatsController {
     public PlayerStatsResponse getPlayerStatsByJerseyNumber(@PathVariable Integer number) {
         return playerStatsService.getPlayerStatsByJerseyNumber(number);
     }
+
+    @GetMapping("/team-summary")
+    public TeamSummaryResponse getTeamSummary() {
+        return playerStatsService.getTeamSummary();
+    }
 }
