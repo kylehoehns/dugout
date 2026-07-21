@@ -9,7 +9,11 @@ Add **one** team-summary endpoint to the existing `/api/stats` API — same JSON
 style as the rest of `/api/stats`, no UI. It shows how the whole team is hitting
 this season: a headline team batting average plus the roster ordered by who has
 the most hits. Additive only — it does **not** change the existing `PlayerStats`
-entity, `PlayerStatsResponse`, or the existing `/api/stats` endpoints.
+entity, the **JSON/API shape** of `PlayerStatsResponse`, or the existing
+`/api/stats` endpoints. (One internal-only tweak is allowed per the Reuse section
+below: an existing `PlayerStatsResponse` rounding helper's *visibility* is widened
+from `private` to package-visible so the team average can reuse it — no field,
+serialized shape, or endpoint behavior changes.)
 
 ## Reuse — do NOT re-derive (read first)
 
