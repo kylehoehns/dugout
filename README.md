@@ -90,6 +90,35 @@ reproduce what the level demonstrates.
 
 </details>
 
+## The end game
+
+By the top of the ladder (Levels 6–8), a single ticket becomes a shipped, reviewed
+pull request. **You** plan it and kick it off — the agent team does the rest while
+you're at lunch.
+
+```mermaid
+flowchart TD
+    subgraph you["🧑 You lead — a few minutes"]
+        direction TB
+        T["Read the ticket (a GitHub issue)"] --> P["Plan it — ADRs + a checked plan"]
+        P --> K["🚀 'Ship it' — your last keystroke"]
+    end
+
+    K ==> B
+
+    subgraph bot["🤖 Agent runs solo — the rest is automatic 🍔"]
+        direction TB
+        B["Build the feature in a worktree<br/>a team fans out: developer · tester · reviewer ×3 · doc-writer<br/>🔒 gates: tests · coverage · format"] --> S["Ship — commit · push · open the PR"]
+        S --> R["Adversarial review — PR bots → auto-address → re-run until green"]
+        R --> N["📱 Notify you"]
+    end
+
+    N ==> DONE(["✅ Back from lunch to a green PR"])
+```
+
+**Generation is cheap. Review is the bottleneck.** Your job moves *up* the stack:
+**delegate, review, own.**
+
 ## Run it
 
 ```bash
