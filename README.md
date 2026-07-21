@@ -138,9 +138,6 @@ flowchart LR
     class DONE done
 ```
 
-**Generation is cheap. Review is the bottleneck.** Your job moves *up* the stack:
-**delegate, review, own.**
-
 ## Run it
 
 ```bash
