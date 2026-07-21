@@ -11,7 +11,7 @@ test your code, to a whole team of AI sub-agents shipping a feature through a re
 pull request.
 
 **Every level is its own branch you can open and run.** So you don't just read
-about each step — you can check it out, run it, and poke at it yourself.
+about each level — you can check it out, run it, and poke at it yourself.
 
 The domain is baseball — `Player`s and their stats — because it's easy to read at
 a glance. You don't need to know baseball (or Java) to follow along.
@@ -30,7 +30,7 @@ a glance. You don't need to know baseball (or Java) to follow along.
 ## The levels
 
 `main` is the blank starting point. Each `stage-N` branch builds on the one before
-it, so you can walk them in order and watch the project level up one step at a time.
+it, so you can go in order and watch the project level up one at a time.
 
 | Level | Branch | What you'll find there |
 |-------|--------|------------------------|
@@ -92,7 +92,7 @@ reproduce what the level demonstrates.
 
 ## The end game
 
-By the top of the ladder (Levels 6–8), a single ticket becomes a shipped, reviewed
+By the highest levels (6–8), a single ticket becomes a shipped, reviewed
 pull request. **You** plan it and kick it off — the agent team does the rest while
 you're at lunch.
 
