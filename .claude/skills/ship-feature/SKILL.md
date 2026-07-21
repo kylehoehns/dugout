@@ -63,8 +63,20 @@ Run this top to bottom. **Do not start Build until the human confirms the spec.*
 > run clean, and it proves the spec stands on its own — if the build reaches for
 > something only the chat knew, the spec was incomplete.
 
-4. **Read `docs/<feature>-spec.md`** and plan from it.
-5. **developer** — implement the production code; wait until it compiles.
+4. **Read `docs/<feature>-spec.md`** and plan from it. As you read, pull out every
+   explicit **"reuse X / don't re-derive Y"** constraint the spec states — these
+   are what reviewers most often catch as violations, so they must reach the
+   developer verbatim (see step 5), not stay in your head.
+5. **developer** — implement the production code. Get two things right in the
+   hand-off prompt:
+   - **Promote the spec's "reuse / don't re-derive" constraints to first-class,
+     up-front instructions** — e.g. "reuse the existing `battingAverage` rounding
+     rather than re-deriving scale/rounding." Buried in prose they get missed and
+     cost a fix pass; stated plainly they get honored.
+   - Tell the developer to finish by running **`./gradlew spotlessApply`** and then
+     `./gradlew compileJava` before handing back — Spotless (googleJavaFormat, AOSP)
+     violations otherwise surface later at the tester's full build and waste a
+     round-trip. Wait until it compiles.
 6. **tester** — write tests; `./gradlew build` must be green (the coverage gate).
    If the build fails on **Spotless** formatting, run `./gradlew spotlessApply`
    and re-verify — Spotless prints that exact command in its failure output.
@@ -129,21 +141,32 @@ GitHub Copilot code review is enabled on this repo, so it reviews the PR
 automatically. This wait is **poll-based** — there is no push event to hook; you
 poll `gh` on an interval until the review lands.
 
-12. **Wait for Copilot.** Poll until an unresolved review thread authored by
-    Copilot exists (bot login contains `copilot`). Check every ~30s, up to ~10
-    minutes. If nothing arrives in that window, say so and skip to the wrap-up (do
-    not hang forever). Fetch threads with GraphQL — you need thread node IDs to
-    reply and resolve:
+12. **Wait for Copilot.** Poll every ~30s, up to ~10 minutes, for Copilot (bot
+    login contains `copilot`) to **submit its review**. Query BOTH the reviews and
+    the threads in one call — a Copilot review often lands with *zero* inline
+    threads (it posts a summary review and nothing to act on), so polling only for
+    an unresolved thread would spin the full 10 minutes and then falsely report
+    "Copilot never reviewed." You need the thread node IDs to reply/resolve anyway:
 
     ```bash
     gh api graphql -f query='
       query($owner:String!,$repo:String!,$pr:Int!){
         repository(owner:$owner,name:$repo){ pullRequest(number:$pr){
+          reviews(first:50){ nodes{ author{login} state } }
           reviewThreads(first:100){ nodes{
             id isResolved isOutdated
             comments(first:20){ nodes{ databaseId author{login} body path line } } } } } } }' \
       -f owner="${OWNER_REPO%/*}" -f repo="${OWNER_REPO#*/}" -F pr="$PR"
     ```
+
+    Stop polling at the **first** of these three terminal states — never hang past
+    the window:
+    - **Copilot review present *and* it has unresolved Copilot threads** → go to
+      step 13 and triage them.
+    - **Copilot review present but no unresolved Copilot threads** (e.g. "reviewed
+      N/N files and generated no comments") → this is a **clean pass**, not a
+      timeout. Note it and skip to the wrap-up.
+    - **No Copilot review at all after ~10 min** → say so and skip to the wrap-up.
 
 13. **Triage each unresolved Copilot thread — one at a time.** Read the comment
     and the code it points at, then make your **best judgment**:
