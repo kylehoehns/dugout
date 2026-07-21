@@ -97,23 +97,45 @@ pull request. **You** plan it and kick it off — the agent team does the rest w
 you're at lunch.
 
 ```mermaid
-flowchart TD
-    subgraph you["🧑 You lead — a few minutes"]
+flowchart LR
+    subgraph you["🧑 &nbsp;You lead — a few minutes"]
         direction TB
-        T["Read the ticket (a GitHub issue)"] --> P["Plan it — ADRs + a checked plan"]
-        P --> K["🚀 'Ship it' — your last keystroke"]
+        T["📋 Read the ticket<br/>a GitHub issue"] --> P["🧠 Plan it<br/>ADRs + a checked plan"]
+        P --> K["🚀 Ship it<br/><i>your last keystroke</i>"]
+    end
+
+    subgraph bot["🤖 &nbsp;Agent runs solo — go to lunch 🍔"]
+        B["🏗️ Build<br/>in a worktree"] --> DEV["👩‍💻 developer"]
+        B --> TST["🧪 tester"]
+        B --> REV["🔍 reviewer ×3"]
+        B --> DOC["📝 doc-writer"]
+        DEV --> G{{"🔒 gates<br/>tests · coverage · format"}}
+        TST --> G
+        REV --> G
+        DOC --> G
+        G --> PR["📤 Open the PR<br/>commit · push"]
+        PR --> RV["🛡️ Adversarial review<br/>PR bots + reviewers"]
+        RV -->|"issues found"| FIX["🔧 auto-address"]
+        FIX -.-> RV
+        RV -->|"green"| N["📱 Notify you"]
     end
 
     K ==> B
+    N ==> DONE(["✅ A green PR,<br/>waiting for your review"])
 
-    subgraph bot["🤖 Agent runs solo — the rest is automatic 🍔"]
-        direction TB
-        B["Build the feature in a worktree<br/>a team fans out: developer · tester · reviewer ×3 · doc-writer<br/>🔒 gates: tests · coverage · format"] --> S["Ship — commit · push · open the PR"]
-        S --> R["Adversarial review — PR bots → auto-address → re-run until green"]
-        R --> N["📱 Notify you"]
-    end
+    classDef human fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
+    classDef ship fill:#2563eb,stroke:#1e40af,stroke-width:2px,color:#ffffff
+    classDef build fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#78350f
+    classDef team fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#4c1d95
+    classDef gate fill:#fee2e2,stroke:#dc2626,stroke-width:2px,color:#7f1d1d
+    classDef done fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
 
-    N ==> DONE(["✅ Back from lunch to a green PR"])
+    class T,P human
+    class K ship
+    class B,PR,RV,FIX,N build
+    class DEV,TST,REV,DOC team
+    class G gate
+    class DONE done
 ```
 
 **Generation is cheap. Review is the bottleneck.** Your job moves *up* the stack:
