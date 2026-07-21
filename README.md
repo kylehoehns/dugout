@@ -41,12 +41,12 @@ it, so you can walk them in order and watch the project level up one step at a t
 | **4** | [`stage-4`](https://github.com/kylehoehns/dugout/tree/stage-4) | **Your first custom skill** — a reusable instruction (`writing-tests`) that kicks in automatically whenever tests get written. |
 | **5** | [`stage-5`](https://github.com/kylehoehns/dugout/tree/stage-5) | **Quality gates** — test coverage, auto-formatting, and CI, so the AI's work is held to a real standard. |
 | **6** | [`stage-6`](https://github.com/kylehoehns/dugout/tree/stage-6) | **A team of sub-agents** — one skill directs a developer, a tester, reviewers, and a doc-writer to build a whole feature together. |
-| **7** | [`stage-7-start`](https://github.com/kylehoehns/dugout/tree/stage-7-start) | **The team ships like a real dev** — from a written spec, the agents open a pull request, wait for CI, read the code-review feedback, verify the running app, and ping your phone when it's done. *Built live from this branch during the talk.* |
-| **8** | [`stage-8-start`](https://github.com/kylehoehns/dugout/tree/stage-8-start) | **Start from a GitHub issue** — the AI grills the issue into a sharp spec (writing decision records and a glossary as it goes), then the team ships it. *Built live from this branch during the talk.* |
+| **7** | [`stage-7`](https://github.com/kylehoehns/dugout/tree/stage-7) | **The team ships like a real dev** — from a written spec, the agents open a pull request, wait for CI, read the code-review feedback, verify the running app, and ping your phone when it's done. *Start from [`stage-7-start`](https://github.com/kylehoehns/dugout/tree/stage-7-start) to build it yourself.* |
+| **8** | [`stage-8`](https://github.com/kylehoehns/dugout/tree/stage-8) | **Start from a GitHub issue** — the AI grills the issue into a sharp spec, writing decision records ([`docs/adr/`](https://github.com/kylehoehns/dugout/tree/stage-8/docs/adr)) and a domain glossary ([`CONTEXT.md`](https://github.com/kylehoehns/dugout/blob/stage-8/CONTEXT.md)) as it goes, then the team ships it. *Start from [`stage-8-start`](https://github.com/kylehoehns/dugout/tree/stage-8-start) to build it yourself.* |
 
-Levels 0–6 are finished branches you can browse and run. Levels 7 and 8 are the
-starting points I build from live on stage — check them out to see the setup, then
-watch the AI take it the rest of the way.
+Every level is a finished branch you can browse and run. Levels 7 and 8 also have
+a `-start` scaffold — check that out and run the [follow-along prompt](#the-levels)
+to build the level yourself, the way it's done live on stage.
 
 ```bash
 git checkout stage-3   # jump to any level on your own machine
