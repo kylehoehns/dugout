@@ -52,6 +52,44 @@ watch the AI take it the rest of the way.
 git checkout stage-3   # jump to any level on your own machine
 ```
 
+<details>
+<summary><strong>Follow along — the exact prompts to try at each level</strong></summary>
+
+<br>
+
+Check out a level, [run it](#run-it), then type these into your AI assistant to
+reproduce what the level demonstrates.
+
+**Level 1 — ask in the sidebar (the AI advises; you make the edits):**
+> How do I add an endpoint to return a single player by id from this hardcoded list?
+
+> What if the id isn't found?
+
+**Level 2 — let it edit your files:**
+> The player data is hardcoded and duplicated in the controller. Extract it into a `PlayerService` (`@Service`) and have the controller delegate to it. Keep it an in-memory list for now.
+
+**Level 3 — hand it the terminal:**
+> Replace the hardcoded player list with real persistence: Spring Data JPA + an in-memory H2 database. Add the dependencies, make `Player` a JPA entity, add a repository, seed the three players on startup, and run the build until it's green.
+
+> Add a `POST /api/players` endpoint to create a new player.
+
+**Level 4 — watch the `writing-tests` skill kick in:**
+> Write an integration test for the players API.
+
+**Level 5 — watch the coverage gate make it write tests:**
+> Add an endpoint `GET /api/players/count` that returns the roster size, and `GET /api/players/positions` that returns the distinct positions on the roster.
+
+**Level 6 — the sub-agent team builds a whole feature:**
+> Build the feature in `docs/player-filter-spec.md`.
+
+**Level 7 — the team ships from a spec through a pull request:**
+> Ship the feature in `docs/roster-stats-spec.md`.
+
+**Level 8 — the team starts from a GitHub issue:**
+> Ship the feature in issue #8.
+
+</details>
+
 ## Run it
 
 ```bash
