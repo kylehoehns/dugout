@@ -15,9 +15,7 @@ public class PlayerStatsService {
     // for a deterministic order.
     private static final Comparator<PlateDisciplineResponse> PLATE_DISCIPLINE_ORDER =
             Comparator.comparing(PlateDisciplineResponse::eye, Comparator.reverseOrder())
-                    .thenComparing(
-                            PlateDisciplineResponse::walks,
-                            Comparator.nullsLast(Comparator.reverseOrder()))
+                    .thenComparing(PlateDisciplineResponse::walks, Comparator.reverseOrder())
                     .thenComparing(PlateDisciplineResponse::jerseyNumber);
 
     private final PlayerStatsRepository playerStatsRepository;

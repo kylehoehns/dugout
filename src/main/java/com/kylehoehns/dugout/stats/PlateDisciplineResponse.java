@@ -13,9 +13,13 @@ public record PlateDisciplineResponse(
         return new PlateDisciplineResponse(
                 stats.getJerseyNumber(),
                 stats.getFirstName() + " " + stats.getLastName(),
-                stats.getWalks(),
-                stats.getStrikeouts(),
+                nullToZero(stats.getWalks()),
+                nullToZero(stats.getStrikeouts()),
                 calculateEye(stats.getWalks(), stats.getStrikeouts()));
+    }
+
+    private static int nullToZero(Integer value) {
+        return value == null ? 0 : value;
     }
 
     static BigDecimal calculateEye(Integer walks, Integer strikeouts) {
