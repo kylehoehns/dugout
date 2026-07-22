@@ -5,8 +5,8 @@ description: >
   sub-agent team — asks like "ship the feature in issue #8", "build the ticket
   #8", or "ship GitHub issue #8". Reads the issue as the source of truth, grills
   it into a spec with grill-with-docs, then orchestrates the developer, tester,
-  reviewers, and doc-writer through build → test → review → PR → CI →
-  address-review → verify live → notify.
+  refactorer, reviewers, and doc-writer through build → test → refactor → review →
+  PR → CI → address-review → verify live → notify.
 ---
 
 # Ship a Feature (team orchestration)
@@ -80,6 +80,16 @@ Run this top to bottom. **Do not start Build until the human confirms the spec.*
 6. **tester** — write tests; `./gradlew build` must be green (the coverage gate).
    If the build fails on **Spotless** formatting, run `./gradlew spotlessApply`
    and re-verify — Spotless prints that exact command in its failure output.
+
+   > **Refactor on green (once, before the review).** Now that the build is green,
+   > hand the just-built code to the **`refactorer`** for a one-time,
+   > behavior-preserving cleanup pass over the **production code** — the green test
+   > suite is its safety net. It must re-run `./gradlew build` and confirm it's
+   > still green before handing back. Run it **here**, not inside the fix loop
+   > (step 8), and keep its instruction generic ("improve internal structure without
+   > changing behavior") — don't name duplication or you're just prompting the
+   > outcome. Reviewers then see already-clean code and file fewer findings.
+
 7. **Review + docs — launch in parallel.** Capture the change first with
    `git diff HEAD`. Then in ONE message, make four `Task` calls together, **passing
    that diff to each reviewer** (they're read-only and can't fetch it themselves):
