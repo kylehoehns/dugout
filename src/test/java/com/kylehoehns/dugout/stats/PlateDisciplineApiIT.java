@@ -16,16 +16,14 @@ import tools.jackson.databind.ObjectMapper;
 
 // Several assertions below intentionally depend on the seeded values in
 // src/main/resources/roster-stats.csv, so editing the CSV will require updating these
-// tests accordingly.
+// tests accordingly. They track the acceptance examples in docs/plate-discipline-spec.md,
+// which uses the eye = BB/SO values computed from the seeded columns (BB, SO) wired up by
+// RosterStatsLoader/PlayerStats: e.g. #23 Mason Reed 12/1 = 12.000 (top), #92 Cooper Lane
+// 18/9 = 2.000, #86 Easton Gray 18/11 = 1.636, #16 Brody Vance 9/18 = 0.500 (worst).
 //
-// Note: the spec's (docs/plate-discipline-spec.md) worked eye numbers for players other
-// than #23 Mason Reed do not reproduce from the actual seeded CSV under the walks (BB)/
-// strikeouts (SO) columns already wired up by RosterStatsLoader/PlayerStats - e.g. the
-// spec's own tiebreak example asks for Landon Cross at 13 BB / 26 SO and Brody Vance at
-// 9 BB / 18 SO, but the seeded row for Cross is 13 BB / 10 SO. Below we assert the real,
-// correctly-computed values from the existing seeded columns instead of the spec's
-// figures, and cover the tiebreak/SO=0/0-0 behaviors with self-seeded players (as the
-// spec itself directs for the SO=0 and 0/0 cases, since the seeded roster has neither).
+// The seeded roster has no natural eye tie and no SO=0 or 0/0 line, so the walks-tiebreak,
+// SO=0 divide-by-1 guard, and 0/0 -> 0.000 behaviors are covered with self-seeded players
+// below (as the spec directs for those cases).
 @SpringBootTest
 @AutoConfigureMockMvc
 class PlateDisciplineApiIT {
