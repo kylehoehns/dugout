@@ -83,8 +83,9 @@ Run this top to bottom. **Do not start Build until the human confirms the spec.*
 
    > **Refactor on green (once, before the review).** Now that the build is green,
    > hand the just-built code to the **`refactorer`** for a one-time,
-   > behavior-preserving cleanup pass over the **production code** — the green test
-   > suite is its safety net. It must re-run `./gradlew build` and confirm it's
+   > behavior-preserving cleanup pass — production code first (the green suite is its
+   > oracle), then the tests (production now frozen; parameterize/extract but keep
+   > every case and don't drop coverage). It must re-run `./gradlew build` and confirm it's
    > still green before handing back. Run it **here**, not inside the fix loop
    > (step 8), and keep its instruction generic ("improve internal structure without
    > changing behavior") — don't name duplication or you're just prompting the
