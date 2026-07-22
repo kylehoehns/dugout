@@ -25,4 +25,9 @@ public class PlayerStatsController {
     public PlayerStatsResponse getPlayerStatsByJerseyNumber(@PathVariable Integer number) {
         return playerStatsService.getPlayerStatsByJerseyNumber(number);
     }
+
+    @GetMapping("/plate-discipline")
+    public List<PlateDisciplineResponse> getPlateDiscipline() {
+        return playerStatsService.getPlateDiscipline();
+    }
 }

@@ -249,6 +249,75 @@ HTTP/1.1 404 Not Found
 
 ---
 
+### Plate-discipline leaderboard
+
+Returns qualifying players ranked by plate discipline ("eye" — the
+walk-to-strikeout ratio), best eye first. This is purely additive: it doesn't
+change the `/api/stats` or `/api/stats/{number}` responses above.
+
+```
+GET /api/stats/plate-discipline
+```
+
+No query parameters.
+
+**Response — 200 OK**
+
+An array of plate-discipline objects, one per **qualifying** player (see
+[Qualification and eye](#qualification-and-eye) below). Returns `200 []` if no
+player qualifies.
+
+| Field         | Type    | Description                                      |
+|---------------|---------|---------------------------------------------------|
+| `jerseyNumber`| number  | Jersey number (unique, natural key).               |
+| `name`        | string  | `firstName + " " + lastName`.                      |
+| `walks`       | number  | Walks (base on balls).                             |
+| `strikeouts`  | number  | Strikeouts.                                        |
+| `eye`         | number  | Computed — see [Qualification and eye](#qualification-and-eye) below. |
+
+**Sort order:** `eye` descending, then `walks` descending, then
+`jerseyNumber` ascending (deterministic tie-break).
+
+**Example**
+
+```
+GET /api/stats/plate-discipline
+```
+
+```json
+[
+  { "jerseyNumber": 23, "name": "Mason Reed",   "walks": 12, "strikeouts": 1,  "eye": 12.000 },
+  { "jerseyNumber": 92, "name": "Cooper Lane",  "walks": 18, "strikeouts": 9,  "eye": 2.000 },
+  { "jerseyNumber": 86, "name": "Easton Gray",  "walks": 18, "strikeouts": 11, "eye": 1.636 },
+  { "jerseyNumber": 36, "name": "Owen Bell",    "walks": 7,  "strikeouts": 5,  "eye": 1.400 },
+  { "jerseyNumber": 64, "name": "Landon Cross", "walks": 13, "strikeouts": 10, "eye": 1.300 },
+  { "jerseyNumber": 45, "name": "Jonah West",   "walks": 22, "strikeouts": 19, "eye": 1.158 },
+  { "jerseyNumber": 4,  "name": "Tate Hoehns",  "walks": 9,  "strikeouts": 8,  "eye": 1.125 },
+  { "jerseyNumber": 11, "name": "Carter Hale",  "walks": 12, "strikeouts": 11, "eye": 1.091 },
+  { "jerseyNumber": 99, "name": "Nolan Pierce", "walks": 12, "strikeouts": 12, "eye": 1.000 },
+  { "jerseyNumber": 1,  "name": "Micah Flynn",  "walks": 6,  "strikeouts": 9,  "eye": 0.667 },
+  { "jerseyNumber": 12, "name": "Silas Fox",    "walks": 11, "strikeouts": 21, "eye": 0.524 },
+  { "jerseyNumber": 16, "name": "Brody Vance",  "walks": 9,  "strikeouts": 18, "eye": 0.500 }
+]
+```
+
+**Example — no qualifying players**
+
+```
+GET /api/stats/plate-discipline
+```
+
+```json
+[]
+```
+
+**Error cases**
+
+None — the endpoint always returns `200`, with an empty array when nobody
+qualifies.
+
+---
+
 ### Batting average
 
 `battingAvg` is computed on every read (not stored) as **hits ÷ at-bats**,
@@ -256,3 +325,19 @@ rounded to 3 decimal places with `HALF_UP` rounding. A player with **0
 at-bats** (or a null at-bats value) returns `0.000` rather than dividing by
 zero. For example, jersey `4` (Tate Hoehns) has 12 hits in 28 at-bats:
 `12 / 28 = 0.4285... → 0.429`.
+
+---
+
+### Qualification and eye
+
+Both computed on every read (not stored), used only by
+`GET /api/stats/plate-discipline`:
+
+- **Eye** = `walks ÷ max(strikeouts, 1)`, rounded to 3 decimal places with
+  `HALF_UP` rounding (same scale/rounding as `battingAvg` above). Flooring
+  strikeouts at `1` avoids a divide-by-zero for a player who has never
+  struck out — e.g. `walks = 8`, `strikeouts = 0` → `eye = 8.000`.
+- **Plate appearances** = `atBats + walks`. A player must have **plate
+  appearances >= 10** to appear in the leaderboard; players below that bar
+  are omitted entirely (not returned with a `0` or `null` eye).
+- A `null` `walks`, `strikeouts`, or `atBats` is treated as `0`.

@@ -9,6 +9,17 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 public class PlayerStatsService {
 
+    private static final int MINIMUM_QUALIFYING_PLATE_APPEARANCES = 10;
+
+    // Highest eye first; ties broken by more walks, then by jersey number ascending
+    // for a deterministic order.
+    private static final Comparator<PlateDisciplineResponse> PLATE_DISCIPLINE_ORDER =
+            Comparator.comparing(PlateDisciplineResponse::eye, Comparator.reverseOrder())
+                    .thenComparing(
+                            PlateDisciplineResponse::walks,
+                            Comparator.nullsLast(Comparator.reverseOrder()))
+                    .thenComparing(PlateDisciplineResponse::jerseyNumber);
+
     private final PlayerStatsRepository playerStatsRepository;
 
     public PlayerStatsService(PlayerStatsRepository playerStatsRepository) {
@@ -27,5 +38,19 @@ public class PlayerStatsService {
                 .findById(jerseyNumber)
                 .map(PlayerStatsResponse::from)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
+    public List<PlateDisciplineResponse> getPlateDiscipline() {
+        return playerStatsRepository.findAll().stream()
+                .filter(PlayerStatsService::isQualifyingForPlateDiscipline)
+                .map(PlateDisciplineResponse::from)
+                .sorted(PLATE_DISCIPLINE_ORDER)
+                .toList();
+    }
+
+    private static boolean isQualifyingForPlateDiscipline(PlayerStats stats) {
+        int plateAppearances =
+                PlateDisciplineResponse.plateAppearances(stats.getAtBats(), stats.getWalks());
+        return plateAppearances >= MINIMUM_QUALIFYING_PLATE_APPEARANCES;
     }
 }
