@@ -27,3 +27,20 @@ _Avoid_: eligible, active, regular
 The team-level rollup returned by `GET /api/stats/team-summary`: the team
 batting average plus the qualified players ordered most-hits-first.
 _Avoid_: team stats, roster summary
+
+**Eye number** (walk-to-strikeout eye):
+A hitter's plate-discipline ratio — walks ÷ strikeouts (`BB / SO`), a real
+baseball "BB/K ratio". Higher means a better eye (patient, rarely chases). A kid
+who **almost never strikes out** (`SO = 0`) would divide by zero, so `SO` is
+treated as `1` for the division (eye = `BB`); a kid with no walks and no
+strikeouts is `0.000`. Expressed to three decimals, rounded the same way as
+batting average (scale-3, HALF_UP). See `docs/adr/0003-eye-so-zero-guard.md`.
+_Avoid_: BB/K, discipline score, patience rating
+
+**Plate-discipline ranking**:
+The team ranked by **eye number** returned by
+`GET /api/stats/plate-discipline`: the **qualified** players (same `atBats ≥ 10`
+rule as the team summary) ordered best-eye-first, each shown with just enough to
+recognize and read them — jersey number, name, walks, strikeouts, and the eye
+number. Best eye first; ties broken by more walks, then jersey number.
+_Avoid_: eye ranking, discipline leaderboard

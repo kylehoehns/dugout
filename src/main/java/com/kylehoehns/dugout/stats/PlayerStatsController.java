@@ -30,4 +30,9 @@ public class PlayerStatsController {
     public TeamSummaryResponse getTeamSummary() {
         return playerStatsService.getTeamSummary();
     }
+
+    @GetMapping("/plate-discipline")
+    public List<PlateDisciplineResponse> getPlateDisciplineRanking() {
+        return playerStatsService.getPlateDisciplineRanking();
+    }
 }

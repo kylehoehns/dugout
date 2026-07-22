@@ -313,6 +313,80 @@ every player below the `atBats >= 10` threshold).
 
 ---
 
+### Plate discipline
+
+Ranks **qualified** players (`atBats >= 10`, same rule as
+[Team summary](#team-summary)) by walk-to-strikeout **eye** — patient hitters
+first. A slim, purpose-built shape rather than the full stats object.
+
+```
+GET /api/stats/plate-discipline
+```
+
+**Response — 200 OK**
+
+A bare JSON array (not a wrapper object), same list-of-players style as
+[`GET /api/stats`](#list-all-player-stats).
+
+| Field         | Type    | Description                                        |
+|---------------|---------|-----------------------------------------------------|
+| `jerseyNumber`| number  | Jersey number (unique, natural key).                 |
+| `name`        | string  | `firstName + " " + lastName`.                        |
+| `walks`       | number  | Walks (base on balls).                               |
+| `strikeouts`  | number  | Strikeouts.                                          |
+| `eye`         | number  | Computed — see [Eye](#eye) below.                    |
+
+`eye` is rounded to 3 decimal places with `HALF_UP` — the same rounding used
+for `battingAvg` (see [Batting average](#batting-average)).
+
+Sorted:
+
+1. `eye` descending (best eye first).
+2. tie → `walks` descending (more patient hitter first).
+3. tie → `jerseyNumber` ascending.
+
+**Example**
+
+```
+GET /api/stats/plate-discipline
+```
+
+```json
+[
+  { "jerseyNumber": 23, "name": "Mason Reed",   "walks": 12, "strikeouts": 1,  "eye": 12.000 },
+  { "jerseyNumber": 92, "name": "Cooper Lane",  "walks": 18, "strikeouts": 9,  "eye": 2.000 },
+  { "jerseyNumber": 86, "name": "Easton Gray",  "walks": 18, "strikeouts": 11, "eye": 1.636 },
+  { "jerseyNumber": 36, "name": "Owen Bell",    "walks": 7,  "strikeouts": 5,  "eye": 1.400 },
+  { "jerseyNumber": 64, "name": "Landon Cross", "walks": 13, "strikeouts": 10, "eye": 1.300 },
+  { "jerseyNumber": 45, "name": "Jonah West",   "walks": 22, "strikeouts": 19, "eye": 1.158 },
+  { "jerseyNumber": 4,  "name": "Tate Hoehns",  "walks": 9,  "strikeouts": 8,  "eye": 1.125 },
+  { "jerseyNumber": 11, "name": "Carter Hale",  "walks": 12, "strikeouts": 11, "eye": 1.091 },
+  { "jerseyNumber": 99, "name": "Nolan Pierce", "walks": 12, "strikeouts": 12, "eye": 1.000 },
+  { "jerseyNumber": 1,  "name": "Micah Flynn",  "walks": 6,  "strikeouts": 9,  "eye": 0.667 },
+  { "jerseyNumber": 12, "name": "Silas Fox",    "walks": 11, "strikeouts": 21, "eye": 0.524 },
+  { "jerseyNumber": 16, "name": "Brody Vance",  "walks": 9,  "strikeouts": 18, "eye": 0.500 }
+]
+```
+
+**Error cases**
+
+None specific to this endpoint — it always returns `200 OK` with `[]` when no
+player qualifies.
+
+---
+
+### Eye
+
+`eye` is computed on every read (not stored) as **walks ÷ strikeouts**,
+rounded to 3 decimal places with `HALF_UP` rounding — reusing the same
+rounding helper as [`battingAvg`](#batting-average). A player with **0
+strikeouts** divides by `1` instead, so `eye = walks` (finite, never a
+divide-by-zero); a player with **0 walks and 0 strikeouts** returns `0.000`.
+Null `walks`/`strikeouts` are treated as `0`. For example, jersey `23` (Mason
+Reed) has 12 walks and 1 strikeout: `12 / 1 = 12.000`.
+
+---
+
 ### Batting average
 
 `battingAvg` is computed on every read (not stored) as **hits ÷ at-bats**,

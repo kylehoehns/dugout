@@ -41,11 +41,16 @@ public record PlayerStatsResponse(
     }
 
     static BigDecimal battingAverage(Integer hits, Integer atBats) {
-        if (atBats == null || atBats == 0) {
+        int safeHits = hits == null ? 0 : hits;
+        return roundedQuotient(safeHits, atBats);
+    }
+
+    static BigDecimal roundedQuotient(Integer numerator, Integer denominator) {
+        if (denominator == null || denominator == 0) {
             return BigDecimal.ZERO.setScale(BATTING_AVG_SCALE, BATTING_AVG_ROUNDING);
         }
-        int safeHits = hits == null ? 0 : hits;
-        return BigDecimal.valueOf(safeHits)
-                .divide(BigDecimal.valueOf(atBats), BATTING_AVG_SCALE, BATTING_AVG_ROUNDING);
+        int safeNumerator = numerator == null ? 0 : numerator;
+        return BigDecimal.valueOf(safeNumerator)
+                .divide(BigDecimal.valueOf(denominator), BATTING_AVG_SCALE, BATTING_AVG_ROUNDING);
     }
 }

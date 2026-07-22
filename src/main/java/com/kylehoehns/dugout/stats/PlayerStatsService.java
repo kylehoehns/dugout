@@ -31,13 +31,27 @@ public class PlayerStatsService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
+    public List<PlateDisciplineResponse> getPlateDisciplineRanking() {
+        return playerStatsRepository.findAll().stream()
+                .filter(this::isQualified)
+                .map(PlayerStatsResponse::from)
+                .map(PlateDisciplineResponse::from)
+                .sorted(
+                        Comparator.comparing(PlateDisciplineResponse::eye)
+                                .reversed()
+                                .thenComparing(
+                                        Comparator.comparing(
+                                                        (PlateDisciplineResponse p) ->
+                                                                p.walks() == null ? 0 : p.walks())
+                                                .reversed())
+                                .thenComparing(PlateDisciplineResponse::jerseyNumber))
+                .toList();
+    }
+
     public TeamSummaryResponse getTeamSummary() {
         List<PlayerStatsResponse> qualified =
                 playerStatsRepository.findAll().stream()
-                        .filter(
-                                player ->
-                                        player.getAtBats() != null
-                                                && player.getAtBats() >= QUALIFYING_AT_BATS)
+                        .filter(this::isQualified)
                         .map(PlayerStatsResponse::from)
                         .toList();
 
@@ -62,5 +76,9 @@ public class PlayerStatsService {
 
         return new TeamSummaryResponse(
                 PlayerStatsResponse.battingAverage(totalHits, totalAtBats), sorted);
+    }
+
+    private boolean isQualified(PlayerStats player) {
+        return player.getAtBats() != null && player.getAtBats() >= QUALIFYING_AT_BATS;
     }
 }
