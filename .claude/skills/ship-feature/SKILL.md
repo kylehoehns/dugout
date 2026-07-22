@@ -4,7 +4,7 @@ description: >
   Use when building a feature end-to-end from a GitHub issue with this project's
   sub-agent team — asks like "ship the feature in issue #8", "build the ticket
   #8", or "ship GitHub issue #8". Reads the issue as the source of truth, grills
-  it into a spec with grill-with-docs, then orchestrates the developer, tester,
+  it into a spec with grill-with-docs, then orchestrates the tdd-developer,
   reviewers, and doc-writer through build → test → review → PR → CI →
   address-review → verify live → notify.
 ---
@@ -66,41 +66,42 @@ Run this top to bottom. **Do not start Build until the human confirms the spec.*
 4. **Read `docs/<feature>-spec.md`** and plan from it. As you read, pull out every
    explicit **"reuse X / don't re-derive Y"** constraint the spec states — these
    are what reviewers most often catch as violations, so they must reach the
-   developer verbatim (see step 5), not stay in your head.
-5. **developer** — implement the production code. Get two things right in the
-   hand-off prompt:
+   tdd-developer verbatim (see step 5), not stay in your head.
+5. **tdd-developer** — build the feature **test-first** (red-green-refactor). One
+   agent owns both the production code and the tests, interleaving them in vertical
+   slices — there is no separate developer/tester hand-off any more. Get two things
+   right in the hand-off prompt:
    - **Promote the spec's "reuse / don't re-derive" constraints to first-class,
      up-front instructions** — e.g. "reuse the existing `battingAverage` rounding
      rather than re-deriving scale/rounding." Buried in prose they get missed and
      cost a fix pass; stated plainly they get honored.
-   - Tell the developer to finish by running **`./gradlew spotlessApply`** and then
-     `./gradlew compileJava` before handing back — Spotless (googleJavaFormat, AOSP)
-     violations otherwise surface later at the tester's full build and waste a
-     round-trip. Wait until it compiles.
-6. **tester** — write tests; `./gradlew build` must be green (the coverage gate).
-   If the build fails on **Spotless** formatting, run `./gradlew spotlessApply`
-   and re-verify — Spotless prints that exact command in its failure output.
-7. **Review + docs — launch in parallel.** Capture the change first with
+   - Point it at the **`tdd`** skill for the process and the **`writing-tests`**
+     skill for this repo's house test conventions, and tell it to finish green:
+     `./gradlew spotlessApply` then `./gradlew build` must pass (the JaCoCo 80%
+     coverage gate and Spotless). If the build fails on **Spotless** formatting, run
+     `./gradlew spotlessApply` and re-verify — Spotless prints that exact command in
+     its failure output.
+6. **Review + docs — launch in parallel.** Capture the change first with
    `git diff HEAD`. Then in ONE message, make four `Task` calls together, **passing
    that diff to each reviewer** (they're read-only and can't fetch it themselves):
    `reuse-reviewer`, `quality-reviewer`, `efficiency-reviewer` (they return
    findings) and `doc-writer` (writes `docs/api.md`). Do **not** run them one at a
    time.
-8. **Fix (one pass)** — if the reviewers raised actionable findings, hand them to
-   `developer` to fix, then `tester` to re-verify `./gradlew build` is green. Do
+7. **Fix (one pass)** — if the reviewers raised actionable findings, hand them back
+   to `tdd-developer` to fix test-first and re-verify `./gradlew build` is green. Do
    this at most once; do not loop.
-9. Confirm `./gradlew build` is green **locally** before you push.
+8. Confirm `./gradlew build` is green **locally** before you push.
 
 ## Ship
 
-10. **Open the PR.** Commit the work, push the branch, and open a PR **targeting
-    this stage's scaffold branch** (for this talk that is `stage-8-start`, so the
+9. **Open the PR.** Commit the work, push the branch, and open a PR **targeting
+    this stage's scaffold branch** (for this talk that is `stage-9-start`, so the
     PR diff shows only what the team built on top of the scaffold — never `main`):
 
     ```bash
     OWNER_REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)   # e.g. kylehoehns/dugout
-    BASE=stage-8-start
-    HEAD=$(git branch --show-current)                                    # stage-8
+    BASE=stage-9-start
+    HEAD=$(git branch --show-current)                                    # stage-9
     git add -A && git commit -m "<concise feature summary>"
     git push -u origin "$HEAD"
     # gh pr create does NOT support --json/-q; it prints the PR URL. Create it,
@@ -119,7 +120,7 @@ The `CI` workflow runs `./gradlew build` on every push and PR. **Green CI is a
 hard gate — do not touch the review until it passes.** Local green does not
 guarantee CI green, so trust the pipeline, not your laptop.
 
-11. **Watch the checks and fix red builds.** Block on the run, and if it fails,
+10. **Watch the checks and fix red builds.** Block on the run, and if it fails,
     pull the *actual failing output* and fix from it — never guess:
 
     ```bash
@@ -129,11 +130,11 @@ guarantee CI green, so trust the pipeline, not your laptop.
     gh run view "$RUN" --log-failed
     ```
 
-    Hand the failing log to `developer` to fix (e.g. Spotless formatting, a
-    coverage shortfall → `tester` adds cases, a compile/test break). Re-verify
-    `./gradlew build` locally, then `git commit && git push` — the push re-triggers
-    CI. Re-watch. **Cap at 3 attempts;** if still red, stop and report the failure
-    in your wrap-up rather than looping.
+    Hand the failing log to `tdd-developer` to fix test-first (e.g. Spotless
+    formatting, a coverage shortfall → it adds cases, a compile/test break).
+    Re-verify `./gradlew build` locally, then `git commit && git push` — the push
+    re-triggers CI. Re-watch. **Cap at 3 attempts;** if still red, stop and report
+    the failure in your wrap-up rather than looping.
 
 ## Address the Copilot review (the loop)
 
@@ -141,7 +142,7 @@ GitHub Copilot code review is enabled on this repo, so it reviews the PR
 automatically. This wait is **poll-based** — there is no push event to hook; you
 poll `gh` on an interval until the review lands.
 
-12. **Wait for Copilot.** Poll every ~30s, up to ~10 minutes, for Copilot (bot
+11. **Wait for Copilot.** Poll every ~30s, up to ~10 minutes, for Copilot (bot
     login contains `copilot`) to **submit its review**. Query BOTH the reviews and
     the threads in one call — a Copilot review often lands with *zero* inline
     threads (it posts a summary review and nothing to act on), so polling only for
@@ -162,13 +163,13 @@ poll `gh` on an interval until the review lands.
     Stop polling at the **first** of these three terminal states — never hang past
     the window:
     - **Copilot review present *and* it has unresolved Copilot threads** → go to
-      step 13 and triage them.
+      step 12 and triage them.
     - **Copilot review present but no unresolved Copilot threads** (e.g. "reviewed
       N/N files and generated no comments") → this is a **clean pass**, not a
       timeout. Note it and skip to the wrap-up.
     - **No Copilot review at all after ~10 min** → say so and skip to the wrap-up.
 
-13. **Triage each unresolved Copilot thread — one at a time.** Read the comment
+12. **Triage each unresolved Copilot thread — one at a time.** Read the comment
     and the code it points at, then make your **best judgment**:
 
     - **Address it** when it is a real correctness, safety, layering, or
@@ -176,8 +177,8 @@ poll `gh` on an interval until the review lands.
     - **Decline it** when it is stylistic noise, out of scope for the spec, or
       conflicts with `AGENTS.md` (e.g. suggests Lombok or Maven — never do that).
 
-    For a change, hand the specific edit to `developer` (keep a running list so you
-    batch the re-verify). Whether you fix or decline, **always reply on the thread
+    For a change, hand the specific edit to `tdd-developer` (keep a running list so
+    you batch the re-verify). Whether you fix or decline, **always reply on the thread
     with a one-line rationale, then resolve it:**
 
     ```bash
@@ -192,17 +193,18 @@ poll `gh` on an interval until the review lands.
       -f t="<THREAD_ID>"
     ```
 
-14. **Punch out the fixes.** If step 13 produced any changes: `tester` re-verifies
-    `./gradlew build` is green, then commit and push. **The push re-triggers CI —
-    go back to step 11 and get it green again** before continuing. Pushing also
-    triggers a fresh Copilot pass; loop back to step 12 to handle new threads, but
+13. **Punch out the fixes.** If step 12 produced any changes: `tdd-developer`
+    re-verifies `./gradlew build` is green, then commit and push. **The push
+    re-triggers CI — go back to step 10 and get it green again** before continuing.
+    Pushing also triggers a fresh Copilot pass; loop back to step 11 to handle new
+    threads, but
     **cap the review at 2 rounds total.** After the second round, reply to any
     remaining threads with your decision, resolve them, and move on. Never loop
     unbounded.
 
 ## Verify it actually runs
 
-15. **Prove the feature works end-to-end against a running app** — green tests
+14. **Prove the feature works end-to-end against a running app** — green tests
     are necessary but not sufficient. Boot the app on **port 8081** (never 8080),
     wait until it's ready, then exercise the feature's endpoints from the spec's
     acceptance examples and capture the REAL responses. Best-effort: if it can't
@@ -225,10 +227,10 @@ poll `gh` on an interval until the review lands.
 
 ## Wrap up
 
-16. **Notify — ping the human.** Post the come-back-from-lunch summary as a PR
+15. **Notify — ping the human.** Post the come-back-from-lunch summary as a PR
     comment that **@mentions the repo owner** (`@kylehoehns`) so it fires a mobile
     notification — the "review it from my phone" handoff. Include: the PR link,
     which issue it addresses, final **CI status**, Copilot comments addressed vs.
-    declined (with reasons), the **live-verified snippet** from step 15, and the
+    declined (with reasons), the **live-verified snippet** from step 14, and the
     final commit sha.
     `gh pr comment "$PR" --body "@kylehoehns 🍱 Come-back-from-lunch report — …"`
